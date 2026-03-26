@@ -611,6 +611,73 @@
 .admin-page .search input:focus-visible {
   box-shadow: 0 0 0 4px rgba(123,63,255,.2), 0 0 0 6px rgba(240, 201, 134, .12);
 }
+          .drink-modal-strength-container {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            margin: .3rem 0 .5rem;
+            padding: .5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+          }
+          .drink-modal-strength-container label {
+            color: #d7d3e8;
+            font-size: .9rem;
+            white-space: nowrap;
+            min-width: 50px;
+          }
+          .drink-strength-slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, rgba(255,77,109,.2), rgba(123,63,255,.3), rgba(200,169,110,.3));
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+          }
+          .drink-strength-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7b3fff, #c8a96e);
+            border: 2px solid rgba(255,255,255,.4);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(123,63,255,.4);
+            transition: all .2s ease;
+          }
+          .drink-strength-slider::-webkit-slider-thumb:hover {
+            width: 22px;
+            height: 22px;
+            box-shadow: 0 6px 18px rgba(123,63,255,.6);
+          }
+          .drink-strength-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7b3fff, #c8a96e);
+            border: 2px solid rgba(255,255,255,.4);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(123,63,255,.4);
+            transition: all .2s ease;
+          }
+          .drink-strength-slider::-moz-range-thumb:hover {
+            width: 22px;
+            height: 22px;
+            box-shadow: 0 6px 18px rgba(123,63,255,.6);
+          }
+          .drink-strength-slider:disabled {
+            opacity: .7;
+            cursor: not-allowed;
+          }
+          .strength-value {
+            color: var(--accent1);
+            font-weight: 600;
+            font-size: .85rem;
+            min-width: 50px;
+            text-align: right;
+          }
       border: 1px solid rgba(200,169,110,.25);
     }
     .drink-name {

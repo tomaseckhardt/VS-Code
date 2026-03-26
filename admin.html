@@ -149,7 +149,6 @@
     // Veškeré stránkové stavy
     let reservations = [];          // Veškeré rezervace ze serveru
     let currentView = 'table';      // Aktuální pohled (table/cards)
-    let userChangedView = false;    // Uživatel ručně změnil pohled (nemění se auto-refresh)
     let dateSortMode = 'none';      // Modo řazení data/času: 'none', 'asc', 'desc'
 
     // Aktualizuje UI indikátor řazení data (•/↑/↓)
@@ -483,9 +482,21 @@
     }
 
     async function loadReservations() {
-      const payload = await apiRequest(API_BASE);
-      reservations = payload.reservations || [];
-      renderViews();
+      try {
+        const payload = await apiRequest(API_BASE);
+        reservations = payload.reservations || [];
+        renderViews();
+        setStatus('Data načtena.', '');
+      } catch (error) {
+        setStatus(error.message + ' · ', 'error');
+        const retryBtn = document.createElement('button');
+        retryBtn.type = 'button';
+        retryBtn.className = 'btn btn-secondary' ;
+        retryBtn.textContent = 'Zkusit znovu';
+        retryBtn.style.marginLeft = '8px';
+        retryBtn.addEventListener('click', loadReservations);
+        statusEl.appendChild(retryBtn);
+      }
     }
 
     refreshBtn.addEventListener('click', async () => {
@@ -514,13 +525,12 @@
 
     tabButtons.forEach(button => {
       button.addEventListener('click', () => {
-        userChangedView = true;
         switchView(button.dataset.view);
       });
     });
 
     function applyMobileViewDefaults() {
-      if (window.matchMedia('(max-width: 760px)').matches && !userChangedView) {
+      if (window.matchMedia('(max-width: 760px)').matches) {
         switchView('cards');
       }
     }

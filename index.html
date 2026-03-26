@@ -50,6 +50,11 @@
           "opens": "18:00",
           "closes": "00:00"
         }
+          // Slider event listener pro aktualizaci textu síly
+          drinkStrengthSlider.addEventListener('input', function() {
+            drinkModalStrength.textContent = strengthLabel(Number(this.value));
+          });
+
       ],
       "sameAs": [
         "https://instagram.com/barx",
@@ -541,7 +546,11 @@
         <div id="drinkModalBadge" class="drink-modal-badge">Signature</div>
         <h3 id="drinkModalTitle"></h3>
         <p id="drinkModalDesc" class="drink-modal-desc"></p>
-        <p class="drink-modal-meta-row"><strong>Síla:</strong> <span id="drinkModalStrength"></span></p>
+        <div class="drink-modal-strength-container">
+          <label for="drinkStrengthSlider"><strong>Síla:</strong></label>
+          <input type="range" id="drinkStrengthSlider" class="drink-strength-slider" min="1" max="5" value="3" disabled>
+          <span id="drinkModalStrength" class="strength-value"></span>
+        </div>
         <p class="drink-modal-meta-row"><strong>Cena:</strong> <span id="drinkModalPrice"></span></p>
         <div id="drinkModalIngredients" class="drink-modal-ingredients"></div>
       </div>
@@ -611,6 +620,7 @@
     const drinkModalIngredients = document.getElementById('drinkModalIngredients');
     const drinkModalVisual = document.getElementById('drinkModalVisual');
     const drinkModalGlyph = document.getElementById('drinkModalGlyph');
+      const drinkStrengthSlider = document.getElementById('drinkStrengthSlider');
     // ===== FORM ELEMENTS =====
     // Prvky rezervačního formuláře
     const reservationForm = document.getElementById('reservationForm');
@@ -783,6 +793,7 @@
       drinkModalTitle.textContent = name;
       drinkModalBadge.textContent = badge;
       drinkModalDesc.textContent = description;
+      drinkStrengthSlider.value = strengthDots;
       drinkModalStrength.textContent = strengthLabel(strengthDots);
       drinkModalPrice.textContent = price;
       drinkModalIngredients.innerHTML = ingredients.map(item => '<span class="ingredient-chip">' + item + '</span>').join('');
@@ -1411,37 +1422,45 @@
 
     reservationForm.addEventListener('submit', async event => {
       event.preventDefault();
-      const guests = Number(guestCountInput.value);
-      const name = document.getElementById('guestName').value.trim();
-      const phone = document.getElementById('guestPhone').value.trim();
-      const email = document.getElementById('guestEmail').value.trim();
-      const note = reservationNoteInput.value.trim();
-      const drink = reservationDrinkInput.value.trim();
-      const vibe = Number(plannedVibeInput.value || 5);
-      const hasDiscount = vibe >= DISCOUNT_TRIGGER_VIBE;
-      const noteWithDiscount = hasDiscount
-        ? (note.includes(DISCOUNT_NOTE_LINE) ? note : (note ? note + '\n' + DISCOUNT_NOTE_LINE : DISCOUNT_NOTE_LINE))
-        : note;
-      const dateValue = reservationDateInput.value;
-      const table = getSelectedTable();
-
-      if (!validateReservationForm({ name, phone, email, guests, dateValue, table })) {
-        setStatus('Prosím oprav označená pole a zkus to znovu.', 'error');
-        return;
-      }
-      if (table.seats < guests) {
-        setBlockError(document.querySelector('.table-block'), tableError, 'Vybraný stůl je pro zadaný počet hostů příliš malý.');
-        setStatus('Vybraný stůl je pro zadaný počet hostů příliš malý.', 'error');
-        return;
-      }
-      if (isReserved(dateValue, state.selectedSlot, state.selectedTable)) {
-        setBlockError(document.querySelector('.table-block'), tableError, 'Tenhle stůl je v daném čase už obsazený.');
-        setStatus('Tenhle stůl je v daném čase už obsazený. Vyber jiný slot nebo místo.', 'error');
-        refreshReservationUI();
-        return;
-      }
-
+      
+      // Loading state
+      const submitBtn = reservationForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      const originalDisabled = submitBtn.disabled;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Odesílám...';
+      
       try {
+        const guests = Number(guestCountInput.value);
+        const name = document.getElementById('guestName').value.trim();
+        const phone = document.getElementById('guestPhone').value.trim();
+        const email = document.getElementById('guestEmail').value.trim();
+        const note = reservationNoteInput.value.trim();
+        const drink = reservationDrinkInput.value.trim();
+        const vibe = Number(plannedVibeInput.value || 5);
+        const hasDiscount = vibe >= DISCOUNT_TRIGGER_VIBE;
+        const noteWithDiscount = hasDiscount
+          ? (note.includes(DISCOUNT_NOTE_LINE) ? note : (note ? note + '\n' + DISCOUNT_NOTE_LINE : DISCOUNT_NOTE_LINE))
+          : note;
+        const dateValue = reservationDateInput.value;
+        const table = getSelectedTable();
+
+        if (!validateReservationForm({ name, phone, email, guests, dateValue, table })) {
+          setStatus('Prosím oprav označená pole a zkus to znovu.', 'error');
+          return;
+        }
+        if (table.seats < guests) {
+          setBlockError(document.querySelector('.table-block'), tableError, 'Vybraný stůl je pro zadaný počet hostů příliš malý.');
+          setStatus('Vybraný stůl je pro zadaný počet hostů příliš malý.', 'error');
+          return;
+        }
+        if (isReserved(dateValue, state.selectedSlot, state.selectedTable)) {
+          setBlockError(document.querySelector('.table-block'), tableError, 'Tenhle stůl je v daném čase už obsazený.');
+          setStatus('Tenhle stůl je v daném čase už obsazený. Vyber jiný slot nebo místo.', 'error');
+          refreshReservationUI();
+          return;
+        }
+
         await apiRequest(API_BASE, {
           method: 'POST',
           body: JSON.stringify({
@@ -1458,28 +1477,30 @@
           })
         });
         await loadReservations();
+        reservationForm.reset();
+        guestCountInput.value = '4';
+        reservationDrinkInput.value = 'MonstRum';
+        plannedVibeInput.value = '5';
+        setMinDate();
+        state.selectedSlot = '';
+        state.selectedTable = '';
+        clearValidation();
+        updateVibeUI();
+        refreshReservationUI();
+        setStatus(
+          hasDiscount
+            ? 'Rezervace byla uložená + přidal jsem poznámku o 10% slevě (vibe 9+).'
+            : 'Rezervace byla uložená do databáze. Najdeš ji v přehledu i na admin stránce.',
+          'success'
+        );
       } catch (error) {
         setStatus(error.message, 'error');
         refreshReservationUI();
-        return;
+      } finally {
+        // Info: Obnovení submit buttonu
+        submitBtn.disabled = originalDisabled;
+        submitBtn.textContent = originalText;
       }
-
-      reservationForm.reset();
-      guestCountInput.value = '4';
-      reservationDrinkInput.value = 'MonstRum';
-      plannedVibeInput.value = '5';
-      setMinDate();
-      state.selectedSlot = '';
-      state.selectedTable = '';
-      clearValidation();
-      updateVibeUI();
-      refreshReservationUI();
-      setStatus(
-        hasDiscount
-          ? 'Rezervace byla uložená + přidal jsem poznámku o 10% slevě (vibe 9+).'
-          : 'Rezervace byla uložená do databáze. Najdeš ji v přehledu i na admin stránce.',
-        'success'
-      );
     });
 
     sizeCanvas();
@@ -1505,6 +1526,42 @@
     }
 
     closeDrinkModal();
+
+    // Focus management - Escape key pro zavření modalu
+    drinkModal.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && drinkModal.classList.contains('is-open')) {
+        e.preventDefault();
+        closeDrinkModal();
+      }
+    });
+
+    // Tab key focus trap - cyklení fokus v modálu
+    drinkModal.addEventListener('keydown', function(e) {
+      if (e.key === 'Tab' && drinkModal.classList.contains('is-open')) {
+        // Najdi všechny focusable prvky
+        const focusableElements = drinkModal.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        const activeElement = document.activeElement;
+
+        // Shift + Tab - jdi na poslední prvek
+        if (e.shiftKey) {
+          if (activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          // Tab - jdi na první prvek, pokud jsem na posledním
+          if (activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    });
+
     initReservationSystem();
   </script>
 

@@ -11,8 +11,8 @@
     "note": "Narozky",
     "drink": "MonstRum",
     "createdAt": "2026-03-25T15:47:33.477Z",
-    "status": "confirmed",
-    "updatedAt": "2026-03-25T18:31:54.072Z"
+    "status": "completed",
+    "updatedAt": "2026-03-26T13:37:10.998Z"
   },
   {
     "id": "0bc318b8-c63b-42a9-ba70-dd0ee379b16a",
@@ -68,8 +68,8 @@
     "note": "Omluva za zpoždění: Měl jsem krizový meeting s kocourem sousedky.\nVIP VIBE BONUS: 10% sleva na celou útratu.",
     "drink": "MonstRum",
     "createdAt": "2026-03-25T18:00:49.303Z",
-    "status": "confirmed",
-    "updatedAt": "2026-03-25T23:04:16.384Z"
+    "status": "completed",
+    "updatedAt": "2026-03-26T13:37:10.998Z"
   },
   {
     "id": "742efdc7-a3d4-4633-aa4b-3e7bca746bc4",
