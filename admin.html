@@ -106,7 +106,13 @@
   </div>
 
   <script>
+    // ===== BarX Admin Dashboard =====
+    // Správa rezervací se live filtrováním, řazením a rychlými akcemi
+
+    // API konfigurace
     const API_BASE = '/api/reservations';
+
+    // Mapování table IDs na lidsky čitelné názvy
     const TABLE_LABELS = {
       'bar-2': 'Bar 02 · Barový pult',
       'window-4': 'Window 04 · U okna',
@@ -115,6 +121,8 @@
       'vip-8': 'VIP 08 · Zadní salonek'
     };
 
+    // ===== DOM REFERENCES =====
+    // Odkazy na klíčové DOM prvky
     const rows = document.getElementById('reservationRows');
     const emptyState = document.getElementById('emptyState');
     const cardsWrap = document.getElementById('reservationCards');
@@ -137,11 +145,14 @@
     const statDrink = document.getElementById('statDrink');
     const statGuests = document.getElementById('statGuests');
 
-    let reservations = [];
-    let currentView = 'table';
-    let userChangedView = false;
-    let dateSortMode = 'none';
+    // ===== STATE VARIABLES =====
+    // Veškeré stránkové stavy
+    let reservations = [];          // Veškeré rezervace ze serveru
+    let currentView = 'table';      // Aktuální pohled (table/cards)
+    let userChangedView = false;    // Uživatel ručně změnil pohled (nemění se auto-refresh)
+    let dateSortMode = 'none';      // Modo řazení data/času: 'none', 'asc', 'desc'
 
+    // Aktualizuje UI indikátor řazení data (•/↑/↓)
     function updateDateSortUI() {
       const indicatorMap = {
         'none': '•',
@@ -161,6 +172,7 @@
       dateSortToggleCards.setAttribute('aria-label', label);
     }
 
+    // Cykluje mode řazení: none → asc → desc → none
     function cycleDateSortMode() {
       if (dateSortMode === 'none') {
         dateSortMode = 'asc';
@@ -173,12 +185,14 @@
       renderViews();
     }
 
+    // Normalizuje status na jednu ze 5 povolených hodnot
     function normalizeStatus(status) {
       const value = String(status || 'new').trim();
       const allowed = ['new', 'called', 'confirmed', 'done', 'completed'];
       return allowed.includes(value) ? value : 'new';
     }
 
+    // Mapuje status internal na zobrazovaný label (česky)
     function statusLabel(status) {
       const map = {
         'new': 'nova',
@@ -190,11 +204,13 @@
       return map[normalizeStatus(status)] || 'nova';
     }
 
+    // Zobrazuje zprávu o statusu (erfolg/error/warning)
     function setStatus(message, type = '') {
       statusEl.textContent = message;
       statusEl.className = type ? 'status ' + type : 'status';
     }
 
+    // Určí, zda je datum dnes, v minulosti, nebo v budoucnosti
     function getDateState(dateValue) {
       const today = new Date().toISOString().split('T')[0];
       if (dateValue === today) return 'today';
@@ -202,12 +218,14 @@
       return 'future';
     }
 
+    // Vrátí českou reprezentaci relatívního data
     function formatRelativeState(state) {
       if (state === 'today') return 'dnes';
       if (state === 'past') return 'minulé';
       return 'budoucí';
     }
 
+    // Přepíná mezi tabulkovým a kartovým pohledem
     function switchView(view) {
       currentView = view;
       tableView.classList.toggle('is-active', view === 'table');
@@ -217,6 +235,7 @@
       });
     }
 
+    // API wrapper - vrací parsed JSON nebo vyhodí chybu
     async function apiRequest(url, options = {}) {
       const response = await fetch(url, {
         headers: {
@@ -234,6 +253,7 @@
       return payload;
     }
 
+    // Formátuje datum a čas pro zobrazení
     function formatDate(dateValue, slotValue) {
       return new Intl.DateTimeFormat('cs-CZ', {
         weekday: 'short',
@@ -243,6 +263,7 @@
       }).format(new Date(dateValue + 'T12:00:00')) + ' · ' + slotValue;
     }
 
+    // Aktualizuje statistiky v panelu (počty, nejčastější drink, hosty)
     function updateStats(items) {
       statTotal.textContent = String(items.length);
       const today = new Date().toISOString().split('T')[0];
@@ -257,6 +278,10 @@
       statDrink.textContent = topDrink ? topDrink[0] : '-';
     }
 
+    // ===== CORE FILTERING & SORTING =====
+    // Filtruje rezervace podle stavu a hledaného termínu
+    // Aplikuje řazení: dateSortMode (ručí), nebo sortBy dropdown
+    // Dohlíží na to, aby dnešní položky byly vždy první
     function getFilteredReservations() {
       const term = searchInput.value.trim().toLowerCase();
       const filtered = reservations.filter(item => {
@@ -326,6 +351,7 @@
       return filtered;
     }
 
+    // Aktualizuje rezervaci (PATCH) a načte data
     async function updateReservation(id, patch, successMessage) {
       await apiRequest(API_BASE + '/' + id, {
         method: 'PATCH',
@@ -335,6 +361,7 @@
       setStatus(successMessage, 'success');
     }
 
+    // Přiřadí event handlery pro akce (call/confirm/done/delete)
     function attachActionHandlers(container, item) {
       container.querySelectorAll('[data-action]').forEach(button => {
         button.addEventListener('click', async () => {
@@ -370,6 +397,8 @@
       });
     }
 
+    // ===== RENDERING =====
+    // Vykresluje tabulkový pohled
     function renderTable(filtered) {
       rows.innerHTML = '';
       emptyState.hidden = filtered.length > 0;
@@ -396,6 +425,7 @@
       });
     }
 
+    // Vykresluje kartový pohled
     function renderCards(filtered) {
       cardsWrap.innerHTML = '';
       emptyCards.hidden = filtered.length > 0;

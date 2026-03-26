@@ -557,7 +557,13 @@
   <div id="cursor-glow"></div>
 
   <script>
+    // ===== BarX Public Website =====
+    // Drink menu, drink modals, a rezervační systém
+
+    // API konfigurace
     const API_BASE = '/api/reservations';
+
+    // Dostupné stoly s místnosti
     const TABLES = [
       { id: 'bar-2', name: 'Bar 02', zone: 'Barový pult', seats: 2 },
       { id: 'window-4', name: 'Window 04', zone: 'U okna', seats: 4 },
@@ -565,6 +571,7 @@
       { id: 'booth-6', name: 'Booth 06', zone: 'Polouzavřený box', seats: 6 },
       { id: 'vip-8', name: 'VIP 08', zone: 'Zadní salonek', seats: 8 }
     ];
+    // Vtipné omluvy za pozdní příchod (náhodně vybéráno)
     const FUNNY_EXCUSES = [
       'Zdržel mě tygr v metru.',
       'Řidič tramvaje čekal, až dopije espresso.',
@@ -575,17 +582,25 @@
       'Navigace mě poslala přes tajnou únikovou chodbu.',
       'Uvízl jsem ve frontě na poslední trdelník ve městě.'
     ];
-    const DISCOUNT_TRIGGER_VIBE = 9;
+    // ===== CONSTANTS =====
+    // Konfigurace vibe systému a cen
+    const DISCOUNT_TRIGGER_VIBE = 9;          // Vibe 9+ záská 10% slevu
     const DISCOUNT_NOTE_LINE = 'VIP VIBE BONUS: 10% sleva na celou útratu.';
-    const BASE_SPEND_PER_GUEST = 520;
-    const VIBE_SPEND_STEP = 0.08;
+    const BASE_SPEND_PER_GUEST = 520;          // Základ pro odhad ceny
+    const VIBE_SPEND_STEP = 0.08;             // Nárůst ceny za bod vibe
 
+    // ===== DOM REFERENCES =====
+    // Odkazy na všechny klíčové DOM prvky
     const cursorGlow = document.getElementById('cursor-glow');
     const canvas = document.getElementById('hero-canvas');
     const ctx = canvas.getContext('2d');
     const COLORS = ['rgba(123,63,255,', 'rgba(255,77,109,', 'rgba(200,169,110,', 'rgba(0,212,170,', 'rgba(255,110,180,'];
+    // Klíčové DOM prvky pro menu a karty
     const menuTabs = document.querySelectorAll('.tab-btn');
     const drinkCards = document.querySelectorAll('.drink-card[data-category]');
+
+    // ===== DRINK MODAL ELEMENTS =====
+    // Prvky modalu pro details napójů
     const drinkModal = document.getElementById('drinkModal');
     const drinkModalClose = document.getElementById('drinkModalClose');
     const drinkModalTitle = document.getElementById('drinkModalTitle');
@@ -596,6 +611,8 @@
     const drinkModalIngredients = document.getElementById('drinkModalIngredients');
     const drinkModalVisual = document.getElementById('drinkModalVisual');
     const drinkModalGlyph = document.getElementById('drinkModalGlyph');
+    // ===== FORM ELEMENTS =====
+    // Prvky rezervačního formuláře
     const reservationForm = document.getElementById('reservationForm');
     const guestNameInput = document.getElementById('guestName');
     const guestPhoneInput = document.getElementById('guestPhone');
@@ -633,6 +650,8 @@
     const slotError = document.getElementById('slotError');
     const tableError = document.getElementById('tableError');
 
+    // ===== STATE =====
+    // Globální stav aplikáce
     const state = {
       selectedSlot: '',
       selectedTable: '',
@@ -640,6 +659,8 @@
       reservations: []
     };
 
+    // ===== DRINK DATA =====
+    // Mapa názvu piti na visulní prvky (barvy, glyfy)
     const DRINK_VISUALS = {
       'MonstRum': { tones: ['#2f1225', '#1f9a6f', '#94f240'], glyph: '🐉' },
       'Shockbrero': { tones: ['#ff7a00', '#ffd36a', '#ff2f55'], glyph: '⚡' },
@@ -651,6 +672,10 @@
       'Violet Ice': { tones: ['#6d28d9', '#a855f7', '#f472b6'], glyph: '❄️' },
       'Smoke Signal': { tones: ['#374151', '#6b7280', '#98e2d2'], glyph: '💨' }
     };
+    // Detail informace pro každý drink (popis, ingredience, cena, síla)
+    // Fallback data pro modal, pokud nejsou dostupné z HTML
+    // Detail informace pro každý drink (popis, ingredience, cena, síla)
+    // Fallback data pro modal, pokud nejsou dostupné z HTML
     const DRINK_DETAILS = {
       'MonstRum': {
         badge: 'Signature',
@@ -717,7 +742,9 @@
       }
     };
 
+    // Formátuje číselné označení síly nápo je na české etikety (0/5 - 5/5)
     function strengthLabel(level) {
+      // Formátuje číselné označení síly nápoje na české etikety (0/5 - 5/5)
       if (level <= 0) return '0/5 · Bez alkoholu';
       if (level <= 2) return level + '/5 · Jemná';
       if (level === 3) return level + '/5 · Střední';
@@ -725,7 +752,9 @@
       return level + '/5 · Velmi silná';
     }
 
+    // Nastaví barvy a glyf modalu podle názvu nápo je
     function setDrinkVisual(name) {
+      // Nastaví barvy a glyf modalu podle názvu nápoje
       const visual = DRINK_VISUALS[name] || { tones: ['#7b3fff', '#ff4d6d', '#c8a96e'], glyph: '🍸' };
       drinkModalVisual.style.setProperty('--drink-tone-1', visual.tones[0]);
       drinkModalVisual.style.setProperty('--drink-tone-2', visual.tones[1]);
@@ -733,6 +762,10 @@
       drinkModalGlyph.textContent = visual.glyph;
     }
 
+    // ===== DRINK MODAL MANAGEMENT =====
+    // Otevře modal s detaily nápo je (s fallback daty z DRINK_DETAILS)
+    // ===== DRINK MODAL MANAGEMENT =====
+    // Otevře modal s detaily nápoje (s fallback daty z DRINK_DETAILS)
     function openDrinkModal(card) {
       const name = card.querySelector('.drink-name')?.textContent.trim() || 'Drink';
       const details = DRINK_DETAILS[name] || {};
@@ -761,13 +794,19 @@
       drinkModalClose.focus();
     }
 
+    // Zavře modal
     function closeDrinkModal() {
+      // Zavře modal
       drinkModal.classList.remove('is-open');
       drinkModal.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('modal-open');
     }
 
+    // ===== API & DATA LOADING =====
+    // API wrapper - vrací parsed JSON nebo vyhodí chybu
+    // ===== API & DATA LOADING =====
     async function apiRequest(url, options = {}) {
+      // API wrapper - vrací parsed JSON nebo vyhází chybu
       const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
@@ -784,17 +823,25 @@
       return payload;
     }
 
+    // Načte všechny rezervace ze serveru
     async function loadReservations() {
+      // Načte všechny rezervace ze serveru
       const payload = await apiRequest(API_BASE);
       state.reservations = payload.reservations || [];
     }
 
+    // Zobrazuje zprávu o stavu výsledku (chyba, úspěch)
     function setStatus(message, type = '') {
+      // Zobrazuje zprávu o stavu výsledku (chyba, úspěch)
       reservationStatus.textContent = message;
       reservationStatus.className = type ? 'reservation-status ' + type : 'reservation-status';
     }
 
+    // ===== DATE & TIME UTILITIES =====
+    // Nastaví minimální datum na zítra
+    // ===== DATE & TIME UTILITIES =====
     function setMinDate() {
+      // Nastaví minimální datum na zítra
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       reservationDateInput.min = today.toISOString().split('T')[0];
@@ -805,7 +852,9 @@
       }
     }
 
+    // Formátuje datum pro zobrazení
     function formatDate(dateValue) {
+      // Formátuje datum pro zobrazení
       if (!dateValue) return 'Vyber datum';
       return new Intl.DateTimeFormat('cs-CZ', {
         weekday: 'long',
@@ -814,7 +863,9 @@
       }).format(new Date(dateValue + 'T12:00:00'));
     }
 
+    // Vrátí otevící dobu pro daný den (v závislosti na dni týdníku)
     function getOpeningHours(dateValue) {
+      // Vrací otviracích dobu pro daný den (v závislosti na dni týdne)
       const date = new Date(dateValue + 'T12:00:00');
       const day = date.getDay();
       if (day === 0) return { start: 18, end: 24, label: 'Neděle 18:00-00:00' };
@@ -822,12 +873,16 @@
       return { start: 17, end: 25, label: 'Po-Čt 17:00-01:00' };
     }
 
+    // Formátuje čás (hodinu) na HH:00 formát
     function formatHour(hour) {
+      // Formátuje čas (hodinu) na HH:00 formát
       const normalized = ((hour % 24) + 24) % 24;
       return String(normalized).padStart(2, '0') + ':00';
     }
 
+    // Generuje dostupné sloty (časové intervaly) pro dané datum
     function getSlotsForDate(dateValue) {
+      // Generuje dostupné sloty (časové intervaly) pro dané datum
       if (!dateValue) return [];
       const hours = getOpeningHours(dateValue);
       const slots = [];
@@ -837,15 +892,23 @@
       return slots;
     }
 
+    // ===== RESERVATION AVAILABILITY =====
+    // Kontroluje, zda je stůl v daném čase už zarezervován
+    // ===== RESERVATION AVAILABILITY =====
     function isReserved(dateValue, slotValue, tableId) {
+      // Kontroluje, zda je stůl v daném čase již zarezervován
       return state.reservations.some(item => item.date === dateValue && item.slot === slotValue && item.tableId === tableId);
     }
 
+    // Vrátí vybraný stůl z TABLES pole
     function getSelectedTable() {
+      // Vrací vybraný stůl z TABLES pole
       return TABLES.find(table => table.id === state.selectedTable);
     }
 
+    // Formátuje cenu na český formát (CZK)
     function formatCurrency(amount) {
+      // Formátuje cenu na český formát (CZK)
       return new Intl.NumberFormat('cs-CZ', {
         style: 'currency',
         currency: 'CZK',
@@ -853,39 +916,54 @@
       }).format(Math.max(0, Math.round(amount || 0)));
     }
 
+    // ===== FORM VALIDATION =====
+    // Nastaví chybovou zprávu a vizuálně označí pole
+    // ===== FORM VALIDATION =====
     function setFieldError(input, errorEl, message) {
+      // Nastaví chybovou zprávu a vizuálně označí pole
       const field = input.closest('.field');
       if (field) field.classList.add('has-error');
       input.setAttribute('aria-invalid', 'true');
       errorEl.textContent = message;
     }
 
+    // Vymaže chybovou zprávu z pole
     function clearFieldError(input, errorEl) {
+      // Vymaže chybovou zprávu z pole
       const field = input.closest('.field');
       if (field) field.classList.remove('has-error');
       input.removeAttribute('aria-invalid');
       errorEl.textContent = '';
     }
 
+    // Vymaže chybovou zprávu z bloku (slot/table)
     function clearBlockError(blockEl, errorEl) {
+      // Vymaže chybovou zprávu z bloku (slot/table)
       blockEl.classList.remove('has-error');
       errorEl.textContent = '';
     }
 
+    // Nastaví chybovou zprávu na blok
     function setBlockError(blockEl, errorEl, message) {
+      // Nastaví chybovou zprávu na blok
       blockEl.classList.add('has-error');
       errorEl.textContent = message;
     }
 
+    // Validační funkce pro e-mail a telefon
     function isValidEmail(value) {
+      // Validační funkce pro e-mail
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     }
 
     function isValidPhone(value) {
+      // Validační funkce pro telefon
       return /^[+\d][\d\s]{7,}$/.test(value);
     }
 
+    // Vymaže všechny chybové zprávy z formuláře
     function clearValidation() {
+      // Vymaže všechny chybové zprávy z formuláře
       clearFieldError(guestNameInput, guestNameError);
       clearFieldError(guestPhoneInput, guestPhoneError);
       clearFieldError(guestEmailInput, guestEmailError);
@@ -895,7 +973,9 @@
       clearBlockError(document.querySelector('.table-block'), tableError);
     }
 
+    // Ověří celý formulář - kontaktní údaje, datum, tabulka
     function validateReservationForm({ name, phone, email, guests, dateValue, table }) {
+      // Ověří celý formulář - kontaktní údaje, datum, tabulka
       clearValidation();
       let firstInvalid = null;
 
