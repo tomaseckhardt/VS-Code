@@ -92,7 +92,7 @@
     <div class="hero-ring ring-2" aria-hidden="true"></div>
     <div class="hero-ring ring-3" aria-hidden="true"></div>
     <p class="hero-eyebrow">Craft Cocktail Bar · Praha</p>
-    <h1>BarX</h1>
+    <h1>BAR X</h1>
     <p class="hero-sub">Kde každý drink vypráví příběh. Originální recepty, prémiové ingredience a atmosféra, kterou nezapomeneš.</p>
     <div class="hero-actions">
       <a href="#menu" class="btn btn-primary">Prozkoumat menu</a>
@@ -528,6 +528,26 @@
   </section>
   </main>
 
+  <div id="drinkModal" class="drink-modal" hidden aria-hidden="true">
+    <div class="drink-modal-backdrop" data-close-modal="true"></div>
+    <div class="drink-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="drinkModalTitle">
+      <button id="drinkModalClose" class="drink-modal-close" type="button" aria-label="Zavřít detail drinku">×</button>
+      <div id="drinkModalVisual" class="drink-modal-visual">
+        <div class="drink-modal-orb"></div>
+        <div class="drink-modal-glow"></div>
+        <div id="drinkModalGlyph" class="drink-modal-glyph">🍸</div>
+      </div>
+      <div class="drink-modal-content">
+        <div id="drinkModalBadge" class="drink-modal-badge">Signature</div>
+        <h3 id="drinkModalTitle"></h3>
+        <p id="drinkModalDesc" class="drink-modal-desc"></p>
+        <p class="drink-modal-meta-row"><strong>Síla:</strong> <span id="drinkModalStrength"></span></p>
+        <p class="drink-modal-meta-row"><strong>Cena:</strong> <span id="drinkModalPrice"></span></p>
+        <div id="drinkModalIngredients" class="drink-modal-ingredients"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <footer>
     <p>© 2026 <span>BarX</span> · Craft Cocktail Bar · Praha · <a class="admin-link" href="/admin.html">Admin přehled</a> · Pij zodpovědně 🍹</p>
@@ -566,6 +586,16 @@
     const COLORS = ['rgba(123,63,255,', 'rgba(255,77,109,', 'rgba(200,169,110,', 'rgba(0,212,170,', 'rgba(255,110,180,'];
     const menuTabs = document.querySelectorAll('.tab-btn');
     const drinkCards = document.querySelectorAll('.drink-card[data-category]');
+    const drinkModal = document.getElementById('drinkModal');
+    const drinkModalClose = document.getElementById('drinkModalClose');
+    const drinkModalTitle = document.getElementById('drinkModalTitle');
+    const drinkModalDesc = document.getElementById('drinkModalDesc');
+    const drinkModalBadge = document.getElementById('drinkModalBadge');
+    const drinkModalStrength = document.getElementById('drinkModalStrength');
+    const drinkModalPrice = document.getElementById('drinkModalPrice');
+    const drinkModalIngredients = document.getElementById('drinkModalIngredients');
+    const drinkModalVisual = document.getElementById('drinkModalVisual');
+    const drinkModalGlyph = document.getElementById('drinkModalGlyph');
     const reservationForm = document.getElementById('reservationForm');
     const guestNameInput = document.getElementById('guestName');
     const guestPhoneInput = document.getElementById('guestPhone');
@@ -609,6 +639,133 @@
       particles: [],
       reservations: []
     };
+
+    const DRINK_VISUALS = {
+      'MonstRum': { tones: ['#2f1225', '#1f9a6f', '#94f240'], glyph: '🐉' },
+      'Shockbrero': { tones: ['#ff7a00', '#ffd36a', '#ff2f55'], glyph: '⚡' },
+      'Dark Velvet': { tones: ['#3f223f', '#7f1d4f', '#d23d6e'], glyph: '🍒' },
+      'Neon Opal': { tones: ['#0ea5e9', '#2563eb', '#57f5d4'], glyph: '💎' },
+      'Crimson Storm': { tones: ['#8a1d2d', '#ff3b5d', '#ff9f43'], glyph: '🔥' },
+      'Gold Rush': { tones: ['#a86d1a', '#ffd166', '#fff0b5'], glyph: '✨' },
+      'Shadow Master': { tones: ['#1a1a2e', '#3b2f5a', '#7ed6df'], glyph: '🌙' },
+      'Violet Ice': { tones: ['#6d28d9', '#a855f7', '#f472b6'], glyph: '❄️' },
+      'Smoke Signal': { tones: ['#374151', '#6b7280', '#98e2d2'], glyph: '💨' }
+    };
+    const DRINK_DETAILS = {
+      'MonstRum': {
+        badge: 'Signature',
+        description: 'Nezkrotná kombinace tmavého rumu a ledově vychlazeného Monster Energy. Nápoj pro ty, kteří neznají slovo klid.',
+        ingredients: ['Tmavý rum', 'Monster Energy', 'Limetka'],
+        price: '149 Kč',
+        strength: 4
+      },
+      'Shockbrero': {
+        badge: 'Signature',
+        description: 'Tequila splyne se Shock Energy a kapkou chilli tinktury. Výsledek? Elektrický šok v každém doušku.',
+        ingredients: ['Tequila', 'Shock Energy', 'Chilli tinktura'],
+        price: '159 Kč',
+        strength: 5
+      },
+      'Dark Velvet': {
+        badge: 'Signature',
+        description: 'Sametově hladký koktejl s whiskey, třešňovým likérem a hořkými tóny angostury. Pro znalce temné strany baru.',
+        ingredients: ['Whiskey', 'Třešňový likér', 'Angostura'],
+        price: '169 Kč',
+        strength: 3
+      },
+      'Neon Opal': {
+        badge: 'Long Drink',
+        description: 'Vizuálně ohromující drink v azurových tónech. Svěží gin s citrusovým curaçao a šumivým tonikem — letní noc ve sklenici.',
+        ingredients: ['Gin', 'Blue Curaçao', 'Tonic', 'Mátový sirup'],
+        price: '145 Kč',
+        strength: 2
+      },
+      'Crimson Storm': {
+        badge: 'Shot',
+        description: 'Malý, ale nekompromisní. Malinová sladkost okamžitě vystřídaná ohnivou kapkou tabasca. Vypij a uvidíš hvězdy.',
+        ingredients: ['Vodka', 'Malina', 'Tabasco'],
+        price: '79 Kč',
+        strength: 5
+      },
+      'Gold Rush': {
+        badge: 'Signature',
+        description: 'Zlatistý bourbon s medem a čerstvým citronem, doplněný šumivým vínem. Luxusní zlatá horečka v každém louku.',
+        ingredients: ['Bourbon', 'Med', 'Citron', 'Šumivé víno'],
+        price: '175 Kč',
+        strength: 3
+      },
+      'Shadow Master': {
+        badge: 'Long Drink',
+        description: 'Tropické noty kokosu a limetky se snoubí s hloubkou černého rumu. Drink, který ovládá noc z temných koutů.',
+        ingredients: ['Černý rum', 'Kokosová voda', 'Limetka', 'Kola'],
+        price: '139 Kč',
+        strength: 3
+      },
+      'Violet Ice': {
+        badge: 'Bez alkoholu',
+        description: 'Krásně fialový nealkoholický mocktail s levandulí, šťávou z granátového jablka a šumivým tonikem. Elegantní a osvěžující.',
+        ingredients: ['Levandulový sirup', 'Granátové jablko', 'Tonic'],
+        price: '89 Kč',
+        strength: 0
+      },
+      'Smoke Signal': {
+        badge: 'Shot',
+        description: 'Tradičně uzený mezcal s šťávou ze zelené limetky a špetkou soli. Prastará síla v malé skleničce.',
+        ingredients: ['Mezcal', 'Zelená limetka', 'Sůl'],
+        price: '85 Kč',
+        strength: 4
+      }
+    };
+
+    function strengthLabel(level) {
+      if (level <= 0) return '0/5 · Bez alkoholu';
+      if (level <= 2) return level + '/5 · Jemná';
+      if (level === 3) return level + '/5 · Střední';
+      if (level === 4) return level + '/5 · Silná';
+      return level + '/5 · Velmi silná';
+    }
+
+    function setDrinkVisual(name) {
+      const visual = DRINK_VISUALS[name] || { tones: ['#7b3fff', '#ff4d6d', '#c8a96e'], glyph: '🍸' };
+      drinkModalVisual.style.setProperty('--drink-tone-1', visual.tones[0]);
+      drinkModalVisual.style.setProperty('--drink-tone-2', visual.tones[1]);
+      drinkModalVisual.style.setProperty('--drink-tone-3', visual.tones[2]);
+      drinkModalGlyph.textContent = visual.glyph;
+    }
+
+    function openDrinkModal(card) {
+      const name = card.querySelector('.drink-name')?.textContent.trim() || 'Drink';
+      const details = DRINK_DETAILS[name] || {};
+      const badge = details.badge || card.querySelector('.drink-badge')?.textContent.trim() || 'Drink';
+      const description = details.description || card.querySelector('.drink-desc')?.textContent.trim() || '';
+      const ingredientsRaw = card.querySelector('.drink-sub')?.textContent.trim() || '';
+      const ingredients = (details.ingredients && details.ingredients.length)
+        ? details.ingredients
+        : ingredientsRaw.split('·').map(item => item.trim()).filter(Boolean);
+      const price = details.price || card.querySelector('.drink-price')?.textContent.trim() || '-';
+      const strengthDots = Number.isInteger(details.strength)
+        ? details.strength
+        : card.querySelectorAll('.abv-dot.filled').length;
+
+      drinkModalTitle.textContent = name;
+      drinkModalBadge.textContent = badge;
+      drinkModalDesc.textContent = description;
+      drinkModalStrength.textContent = strengthLabel(strengthDots);
+      drinkModalPrice.textContent = price;
+      drinkModalIngredients.innerHTML = ingredients.map(item => '<span class="ingredient-chip">' + item + '</span>').join('');
+      setDrinkVisual(name);
+
+      drinkModal.classList.add('is-open');
+      drinkModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      drinkModalClose.focus();
+    }
+
+    function closeDrinkModal() {
+      drinkModal.classList.remove('is-open');
+      drinkModal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('modal-open');
+    }
 
     async function apiRequest(url, options = {}) {
       const response = await fetch(url, {
@@ -1019,6 +1176,39 @@
       });
     });
 
+    drinkCards.forEach(card => {
+      card.classList.add('is-clickable');
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', 'Otevřít detail drinku ' + (card.querySelector('.drink-name')?.textContent.trim() || ''));
+      card.addEventListener('click', () => openDrinkModal(card));
+      card.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openDrinkModal(card);
+        }
+      });
+    });
+
+    const drinkModalDialog = drinkModal.querySelector('.drink-modal-dialog');
+    const drinkModalBackdrop = drinkModal.querySelector('.drink-modal-backdrop');
+
+    drinkModalBackdrop.addEventListener('click', closeDrinkModal);
+    drinkModalDialog.addEventListener('click', event => {
+      event.stopPropagation();
+    });
+    drinkModal.addEventListener('click', event => {
+      if (!event.target.closest('.drink-modal-dialog')) {
+        closeDrinkModal();
+      }
+    });
+    drinkModalClose.addEventListener('click', closeDrinkModal);
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && drinkModal.classList.contains('is-open')) {
+        closeDrinkModal();
+      }
+    });
+
     const revealObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -1234,6 +1424,7 @@
       }
     }
 
+    closeDrinkModal();
     initReservationSystem();
   </script>
 
