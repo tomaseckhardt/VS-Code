@@ -678,75 +678,6 @@
       'Violet Ice': { tones: ['#6d28d9', '#a855f7', '#f472b6'], glyph: '❄️' },
       'Smoke Signal': { tones: ['#374151', '#6b7280', '#98e2d2'], glyph: '💨' }
     };
-    // Detail informace pro každý drink (popis, ingredience, cena, síla)
-    // Fallback data pro modal, pokud nejsou dostupné z HTML
-    // Detail informace pro každý drink (popis, ingredience, cena, síla)
-    // Fallback data pro modal, pokud nejsou dostupné z HTML
-    const DRINK_DETAILS = {
-      'MonstRum': {
-        badge: 'Signature',
-        description: 'Nezkrotná kombinace tmavého rumu a ledově vychlazeného Monster Energy. Nápoj pro ty, kteří neznají slovo klid.',
-        ingredients: ['Tmavý rum', 'Monster Energy', 'Limetka'],
-        price: '149 Kč',
-        strength: 4
-      },
-      'Shockbrero': {
-        badge: 'Signature',
-        description: 'Tequila splyne se Shock Energy a kapkou chilli tinktury. Výsledek? Elektrický šok v každém doušku.',
-        ingredients: ['Tequila', 'Shock Energy', 'Chilli tinktura'],
-        price: '159 Kč',
-        strength: 5
-      },
-      'Dark Velvet': {
-        badge: 'Signature',
-        description: 'Sametově hladký koktejl s whiskey, třešňovým likérem a hořkými tóny angostury. Pro znalce temné strany baru.',
-        ingredients: ['Whiskey', 'Třešňový likér', 'Angostura'],
-        price: '169 Kč',
-        strength: 3
-      },
-      'Neon Opal': {
-        badge: 'Long Drink',
-        description: 'Vizuálně ohromující drink v azurových tónech. Svěží gin s citrusovým curaçao a šumivým tonikem — letní noc ve sklenici.',
-        ingredients: ['Gin', 'Blue Curaçao', 'Tonic', 'Mátový sirup'],
-        price: '145 Kč',
-        strength: 2
-      },
-      'Crimson Storm': {
-        badge: 'Shot',
-        description: 'Malý, ale nekompromisní. Malinová sladkost okamžitě vystřídaná ohnivou kapkou tabasca. Vypij a uvidíš hvězdy.',
-        ingredients: ['Vodka', 'Malina', 'Tabasco'],
-        price: '79 Kč',
-        strength: 5
-      },
-      'Gold Rush': {
-        badge: 'Signature',
-        description: 'Zlatistý bourbon s medem a čerstvým citronem, doplněný šumivým vínem. Luxusní zlatá horečka v každém louku.',
-        ingredients: ['Bourbon', 'Med', 'Citron', 'Šumivé víno'],
-        price: '175 Kč',
-        strength: 3
-      },
-      'Shadow Master': {
-        badge: 'Long Drink',
-        description: 'Tropické noty kokosu a limetky se snoubí s hloubkou černého rumu. Drink, který ovládá noc z temných koutů.',
-        ingredients: ['Černý rum', 'Kokosová voda', 'Limetka', 'Kola'],
-        price: '139 Kč',
-        strength: 3
-      },
-      'Violet Ice': {
-        badge: 'Bez alkoholu',
-        description: 'Krásně fialový nealkoholický mocktail s levandulí, šťávou z granátového jablka a šumivým tonikem. Elegantní a osvěžující.',
-        ingredients: ['Levandulový sirup', 'Granátové jablko', 'Tonic'],
-        price: '89 Kč',
-        strength: 0
-      },
-      'Smoke Signal': {
-        badge: 'Shot',
-        description: 'Tradičně uzený mezcal s šťávou ze zelené limetky a špetkou soli. Prastará síla v malé skleničce.',
-        ingredients: ['Mezcal', 'Zelená limetka', 'Sůl'],
-        price: '85 Kč',
-        strength: 4
-      }
-    };
 
     // Formátuje číselné označení síly nápo je na české etikety (0/5 - 5/5)
     function strengthLabel(level) {
@@ -769,23 +700,16 @@
     }
 
     // ===== DRINK MODAL MANAGEMENT =====
-    // Otevře modal s detaily nápo je (s fallback daty z DRINK_DETAILS)
-    // ===== DRINK MODAL MANAGEMENT =====
-    // Otevře modal s detaily nápoje (s fallback daty z DRINK_DETAILS)
+    // Otevře modal s detaily nápoje odvozenými přímo z vybrané karty
     function openDrinkModal(card) {
       lastFocusedDrinkCard = card instanceof HTMLElement ? card : null;
       const name = card.querySelector('.drink-name')?.textContent.trim() || 'Drink';
-      const details = DRINK_DETAILS[name] || {};
-      const badge = details.badge || card.querySelector('.drink-badge')?.textContent.trim() || 'Drink';
-      const description = details.description || card.querySelector('.drink-desc')?.textContent.trim() || '';
+      const badge = card.querySelector('.drink-badge')?.textContent.trim() || 'Drink';
+      const description = card.querySelector('.drink-desc')?.textContent.trim() || '';
       const ingredientsRaw = card.querySelector('.drink-sub')?.textContent.trim() || '';
-      const ingredients = (details.ingredients && details.ingredients.length)
-        ? details.ingredients
-        : ingredientsRaw.split('·').map(item => item.trim()).filter(Boolean);
-      const price = details.price || card.querySelector('.drink-price')?.textContent.trim() || '-';
-      const strengthDots = Number.isInteger(details.strength)
-        ? details.strength
-        : card.querySelectorAll('.abv-dot.filled').length;
+      const ingredients = ingredientsRaw.split('·').map(item => item.trim()).filter(Boolean);
+      const price = card.querySelector('.drink-price')?.textContent.trim() || '-';
+      const strengthDots = card.querySelectorAll('.abv-dot.filled').length;
 
       drinkModalTitle.textContent = name;
       drinkModalBadge.textContent = badge;
