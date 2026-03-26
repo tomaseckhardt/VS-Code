@@ -444,6 +444,8 @@
       display: none;
       place-items: center;
       padding: 1rem;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .drink-modal.is-open {
       display: grid;
@@ -457,7 +459,8 @@
     .drink-modal-dialog {
       position: relative;
       z-index: 1;
-      width: min(720px, 96vw);
+      width: min(720px, calc(100vw - 2rem));
+      max-height: calc(100vh - 2rem);
       border-radius: 24px;
       border: 1px solid rgba(255,255,255,.1);
       background: linear-gradient(165deg, rgba(26,22,36,.97), rgba(14,12,21,.95));
@@ -465,6 +468,11 @@
       display: grid;
       grid-template-columns: 1fr 1.1fr;
       overflow: hidden;
+    }
+    @supports (height: 100dvh) {
+      .drink-modal-dialog {
+        max-height: calc(100dvh - 2rem);
+      }
     }
     .drink-modal-close {
       position: absolute;
@@ -531,6 +539,8 @@
       display: grid;
       gap: .7rem;
       align-content: start;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .drink-modal-badge {
       display: inline-flex;
@@ -1372,6 +1382,13 @@
 
     /* ── RESPONSIVE ─────────────────────────────────── */
     @media (max-width: 600px) {
+      .drink-modal {
+        align-items: start;
+        padding-top: max(.75rem, env(safe-area-inset-top));
+        padding-right: max(.75rem, env(safe-area-inset-right));
+        padding-bottom: max(.75rem, env(safe-area-inset-bottom));
+        padding-left: max(.75rem, env(safe-area-inset-left));
+      }
       nav {
         padding: .9rem 1rem;
         flex-wrap: wrap;
@@ -1408,9 +1425,17 @@
       .hero-actions .btn { width: 100%; }
       .drink-modal-dialog {
         grid-template-columns: 1fr;
+        width: min(100%, calc(100vw - 1.5rem - env(safe-area-inset-left) - env(safe-area-inset-right)));
+        max-width: calc(100vw - 1.5rem - env(safe-area-inset-left) - env(safe-area-inset-right));
+        max-height: calc(100vh - 1.5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      }
+      @supports (height: 100dvh) {
+        .drink-modal-dialog {
+          max-height: calc(100dvh - 1.5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        }
       }
       .drink-modal-visual {
-        min-height: 210px;
+        min-height: 160px;
       }
       .reservation-panel,
       .reservation-aside { padding: 1rem; }
