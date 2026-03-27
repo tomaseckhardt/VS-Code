@@ -1006,6 +1006,25 @@
       const hasDiscount = vibe >= DISCOUNT_TRIGGER_VIBE;
       plannedVibeValue.textContent = vibe + '/10';
       plannedVibeValue.classList.toggle('is-legendary', isLegendary);
+
+      // Dynamic thumb color: purple at low → pink/red at high
+      const t = (Math.min(vibe, 10) - 1) / 9; // 0..1
+      const r = Math.round(123 + (255 - 123) * t);
+      const g = Math.round(63 - (63 - 45) * t);
+      const b = Math.round(255 - (255 - 109) * t);
+      const wrapper = plannedVibeInput.closest('.vibe-slider-wrapper');
+      plannedVibeInput.style.setProperty('--vibe-thumb-color', 'rgb(' + r + ',' + g + ',' + b + ')');
+      plannedVibeInput.style.setProperty('--vibe-thumb-glow', 'rgba(' + r + ',' + g + ',' + b + ',.6)');
+
+      // Shake animation: starts at vibe 6, max intensity at 11
+      if (vibe >= 6) {
+        const speed = Math.max(0.06, 0.5 - (vibe - 6) * 0.088);
+        wrapper.style.setProperty('--vibe-shake-speed', speed + 's');
+        wrapper.classList.add('is-shaking');
+      } else {
+        wrapper.classList.remove('is-shaking');
+      }
+
       vibeWarning.hidden = !hasDiscount;
       vibeWarning.classList.toggle('is-visible', hasDiscount);
       vibeWarning.classList.toggle('is-legendary', isLegendary);
