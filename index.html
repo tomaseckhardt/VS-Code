@@ -341,6 +341,7 @@
         <div class="reservation-intro">
           <div>
             <p>Vyber datum, čas, oblíbený drink a ideální místo. Rezervace se po odeslání uloží do trvalého JSON úložiště na serveru, takže je najdeš jak v přehledu dole, tak na admin stránce.</p>
+            <div id="reservationAvailability" class="reservation-availability" aria-live="polite">Dnes večer zbývá 5 z 5 stolů.</div>
           </div>
           <div class="reservation-note">
             <strong>Dnes večer</strong>
@@ -397,11 +398,13 @@
               <span id="reservationDateError" class="field-error"></span>
             </div>
             <div class="field field-wide">
-              <label for="plannedVibe" data-tip="Hodnoť náladu večera (1 = klidný, 10 = párty). Vibe 9+ = sleva 10%.">Plánovaný vibe</label>
+              <label for="plannedVibe" data-tip="Hodnoť náladu večera (1 = klidný, 10 = párty). Vibe 9+ = sleva 10 %. Vibe 11/10 = 100 % sleva!">Plánovaný vibe</label>
               <div class="vibe-row">
-                <input id="plannedVibe" name="plannedVibe" type="range" min="1" max="10" step="1" value="5" />
+                <div class="vibe-slider-wrapper">
+                  <input id="plannedVibe" name="plannedVibe" type="range" min="1" max="11" step="1" value="5" />
+                </div>
                 <span id="plannedVibeValue" class="vibe-value">5/10</span>
-                <span id="vibeDiscountBadge" class="vibe-discount-badge" aria-live="polite" data-tip="Dosažhni Vibe 9+ a získáš automaticky 10% slevu">🎯 VIBE <span class="vibe-threshold">9+</span> = -10%</span>
+                <span id="vibeDiscountBadge" class="vibe-discount-badge" aria-live="polite" data-tip="Vibe 9+ = 10 % sleva. Vibe 11/10 = 100 % sleva!">🎯 VIBE <span class="vibe-threshold">9+</span> = -10%</span>
               </div>
               <div id="vibeWarning" class="vibe-warning" hidden role="status" aria-live="assertive" aria-atomic="true">
                 <strong>VIBE 9+ = 10% SLEVA</strong>
@@ -518,6 +521,7 @@
         <div class="contact-icon">📱</div>
         <div class="contact-label">Telefon</div>
         <div class="contact-value">+420 777 123 456</div>
+        <a class="quick-call" href="tel:+420777123456">Zavolat hned</a>
       </div>
       <div class="contact-card">
         <div class="contact-icon">✉️</div>
@@ -589,7 +593,9 @@
     // ===== CONSTANTS =====
     // Konfigurace vibe systému a cen
     const DISCOUNT_TRIGGER_VIBE = 9;          // Vibe 9+ záská 10% slevu
+    const LEGENDARY_VIBE = 11;                // Vibe 11/10 = 100% sleva
     const DISCOUNT_NOTE_LINE = 'VIP VIBE BONUS: 10% sleva na celou útratu.';
+    const LEGENDARY_NOTE_LINE = '🔥 LEGENDARY VIBE 11/10: 100% sleva na celou útratu!';
     const BASE_SPEND_PER_GUEST = 520;          // Základ pro odhad ceny
     const VIBE_SPEND_STEP = 0.08;             // Nárůst ceny za bod vibe
 
@@ -647,6 +653,7 @@
     const summaryEstimateDiscountRow = document.getElementById('summaryEstimateDiscountRow');
     const summaryEstimateDiscount = document.getElementById('summaryEstimateDiscount');
     const summaryEstimateTotal = document.getElementById('summaryEstimateTotal');
+    const reservationAvailability = document.getElementById('reservationAvailability');
     const guestNameError = document.getElementById('guestNameError');
     const guestPhoneError = document.getElementById('guestPhoneError');
     const guestEmailError = document.getElementById('guestEmailError');
@@ -787,14 +794,18 @@
     // Nastaví minimální datum na zítra
     // ===== DATE & TIME UTILITIES =====
     function setMinDate() {
-      // Nastaví minimální datum na zítra
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      reservationDateInput.min = today.toISOString().split('T')[0];
+      // Nastaví minimální datum na zítra (lokální čas, ne UTC)
+      const minDate = new Date();
+      minDate.setDate(minDate.getDate() + 1);
+      const minDateIso =
+        minDate.getFullYear() + '-' +
+        String(minDate.getMonth() + 1).padStart(2, '0') + '-' +
+        String(minDate.getDate()).padStart(2, '0');
+      reservationDateInput.min = minDateIso;
       if (!reservationDateInput.value) {
-        const suggested = new Date(today);
-        suggested.setDate(today.getDate() + 1);
-        reservationDateInput.value = suggested.toISOString().split('T')[0];
+        reservationDateInput.value = minDateIso;
+      } else if (reservationDateInput.value < minDateIso) {
+        reservationDateInput.value = minDateIso;
       }
     }
 
@@ -966,36 +977,50 @@
       const guests = Number(guestCountInput.value || 0);
       const table = getSelectedTable();
       const vibe = Number(plannedVibeInput.value || 5);
-      const hasDiscount = vibe >= DISCOUNT_TRIGGER_VIBE;
-      const vibeMultiplier = 1 + ((vibe - 5) * VIBE_SPEND_STEP);
+      const isLegendary = vibe >= LEGENDARY_VIBE;
+      const hasDiscount = isLegendary || vibe >= DISCOUNT_TRIGGER_VIBE;
+      const discountPercent = isLegendary ? 1 : (hasDiscount ? 0.1 : 0);
+      const vibeMultiplier = 1 + ((Math.min(vibe, 10) - 5) * VIBE_SPEND_STEP);
       const estimateBase = guests > 0 ? guests * BASE_SPEND_PER_GUEST * vibeMultiplier : 0;
-      const estimateDiscount = hasDiscount ? estimateBase * 0.1 : 0;
+      const estimateDiscount = estimateBase * discountPercent;
       const estimateTotal = estimateBase - estimateDiscount;
       summaryDate.textContent = formatDate(reservationDateInput.value);
       summaryTime.textContent = state.selectedSlot || 'Vyber čas';
       summaryTable.textContent = table ? table.name + ' · ' + table.zone : 'Vyber místo';
       summaryDrink.textContent = reservationDrinkInput.value || 'Vyber drink';
       summaryVibe.textContent = vibe + '/10';
+      summaryVibe.classList.toggle('is-legendary', isLegendary);
       summaryDiscountRow.hidden = !hasDiscount;
-      summaryDiscount.textContent = hasDiscount ? '10% aktivní' : 'Neaktivní';
+      summaryDiscount.textContent = isLegendary ? '100% LEGENDARY' : (hasDiscount ? '10% aktivní' : 'Neaktivní');
       summaryGuests.textContent = guests ? guests + (guests === 1 ? ' host' : guests < 5 ? ' hosté' : ' hostů') : 'Vyber počet';
       summaryEstimateBase.textContent = formatCurrency(estimateBase);
       summaryEstimateDiscountRow.hidden = !hasDiscount;
+      summaryEstimateDiscountRow.querySelector('span').textContent = isLegendary ? 'Sleva 100%' : 'Sleva 10%';
       summaryEstimateDiscount.textContent = '-' + formatCurrency(estimateDiscount);
-      summaryEstimateTotal.textContent = formatCurrency(estimateTotal);
+      summaryEstimateTotal.textContent = isLegendary ? '🔥 ZDARMA' : formatCurrency(estimateTotal);
     }
 
     function updateVibeUI() {
       const vibe = Number(plannedVibeInput.value || 5);
+      const isLegendary = vibe >= LEGENDARY_VIBE;
       const hasDiscount = vibe >= DISCOUNT_TRIGGER_VIBE;
       plannedVibeValue.textContent = vibe + '/10';
+      plannedVibeValue.classList.toggle('is-legendary', isLegendary);
       vibeWarning.hidden = !hasDiscount;
       vibeWarning.classList.toggle('is-visible', hasDiscount);
-      vibeDiscountBadge.innerHTML = hasDiscount
-        ? '🔥 <span class="vibe-threshold">9+</span> SPLNĚNO · 10% SLEVA AKTIVNÍ'
-        : '🎯 VIBE <span class="vibe-threshold">9+</span> = -10%';
+      vibeWarning.classList.toggle('is-legendary', isLegendary);
+      if (isLegendary) {
+        vibeWarning.innerHTML = '<strong>🔥 LEGENDARY VIBE 11/10 = 100% SLEVA</strong><span>Celý večer na nás! Tohle je vibe, který se neodmítá.</span>';
+        vibeDiscountBadge.innerHTML = '🔥 <span class="vibe-threshold">11</span> LEGENDARY · 100% SLEVA';
+      } else if (hasDiscount) {
+        vibeWarning.innerHTML = '<strong>VIBE 9+ = 10% SLEVA</strong><span>K rezervaci automaticky přidáme poznámku o 10% slevě.</span>';
+        vibeDiscountBadge.innerHTML = '🔥 <span class="vibe-threshold">9+</span> SPLNĚNO · 10% SLEVA AKTIVNÍ';
+      } else {
+        vibeDiscountBadge.innerHTML = '🎯 VIBE <span class="vibe-threshold">9+</span> = -10%';
+      }
       vibeDiscountBadge.classList.toggle('is-teaser', !hasDiscount);
       vibeDiscountBadge.classList.toggle('is-visible', hasDiscount);
+      vibeDiscountBadge.classList.toggle('is-legendary', isLegendary);
       updateSummary();
     }
 
@@ -1133,6 +1158,31 @@
       renderTables();
       renderSavedReservations();
       updateSummary();
+      updateAvailabilityHint();
+    }
+
+    function updateAvailabilityHint() {
+      if (!reservationAvailability) return;
+      const today = new Date();
+      const todayIso =
+        today.getFullYear() + '-' +
+        String(today.getMonth() + 1).padStart(2, '0') + '-' +
+        String(today.getDate()).padStart(2, '0');
+      const selectedSlot = state && state.selectedSlot;
+      const occupiedTables = new Set(
+        state.reservations
+          .filter(item => {
+            if (item.date !== todayIso) return false;
+            if (item.status === 'completed' || item.status === 'done') return false;
+            if (selectedSlot) return item.slot === selectedSlot;
+            return true;
+          })
+          .map(item => item.tableId)
+      );
+      const freeTables = Math.max(0, TABLES.length - occupiedTables.size);
+      reservationAvailability.textContent =
+        'Dnes večer zbývá ' + freeTables + ' z ' + TABLES.length + ' stolů.';
+      reservationAvailability.classList.toggle('is-low', freeTables <= 1);
     }
 
     document.addEventListener('mousemove', event => {
@@ -1390,9 +1440,11 @@
         const note = reservationNoteInput.value.trim();
         const drink = reservationDrinkInput.value.trim();
         const vibe = Number(plannedVibeInput.value || 5);
-        const hasDiscount = vibe >= DISCOUNT_TRIGGER_VIBE;
+        const isLegendary = vibe >= LEGENDARY_VIBE;
+        const hasDiscount = isLegendary || vibe >= DISCOUNT_TRIGGER_VIBE;
+        const discountLine = isLegendary ? LEGENDARY_NOTE_LINE : DISCOUNT_NOTE_LINE;
         const noteWithDiscount = hasDiscount
-          ? (note.includes(DISCOUNT_NOTE_LINE) ? note : (note ? note + '\n' + DISCOUNT_NOTE_LINE : DISCOUNT_NOTE_LINE))
+          ? (note.includes(discountLine) ? note : (note ? note + '\n' + discountLine : discountLine))
           : note;
         const dateValue = reservationDateInput.value;
         const table = getSelectedTable();

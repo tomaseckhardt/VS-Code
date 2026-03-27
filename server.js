@@ -12,6 +12,12 @@ const PORT = Number(process.env.PORT) || 3000;
 const ROOT_DIR = __dirname;
 const DATA_FILE = path.join(ROOT_DIR, 'reservations.json');
 const LOG_FILE = path.join(ROOT_DIR, 'server.log');
+const ALLOWED_ORIGINS = new Set(
+  String(process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean)
+);
 
 // Validační pravidla
 const VALIDATION = {
@@ -92,20 +98,69 @@ function autoCompleteExpiredReservations(items) {
 }
 
 // Odeslání JSON odpovědi s CORS headerem
-function sendJson(res, statusCode, payload) {
+function getCorsOrigin(req) {
+  const origin = String(req.headers.origin || '').trim();
+  if (!origin) return null;
+  return ALLOWED_ORIGINS.has(origin) ? origin : null;
+}
+
+function getSecurityHeaders() {
+  return {
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Cross-Origin-Opener-Policy': 'same-origin',
+    'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
+    'Content-Security-Policy': "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'"
+  };
+}
+
+function getCorsHeaders(req) {
+  const origin = getCorsOrigin(req);
+  const headers = { 'Vary': 'Origin' };
+  if (origin) {
+    headers['Access-Control-Allow-Origin'] = origin;
+    headers['Access-Control-Allow-Methods'] = 'GET,POST,PATCH,DELETE,OPTIONS';
+    headers['Access-Control-Allow-Headers'] = 'Content-Type';
+  }
+  return headers;
+}
+
+function sendJson(req, res, statusCode, payload) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET,POST,PATCH,DELETE,OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type'
+    ...getSecurityHeaders(),
+    ...getCorsHeaders(req)
   });
   res.end(JSON.stringify(payload));
 }
 
 // Odeslání textové odpovědi
-function sendText(res, statusCode, message) {
-  res.writeHead(statusCode, { 'Content-Type': 'text/plain; charset=utf-8' });
+function sendText(req, res, statusCode, message) {
+  res.writeHead(statusCode, {
+    'Content-Type': 'text/plain; charset=utf-8',
+    ...getSecurityHeaders()
+  });
   res.end(message);
+}
+
+function getClientIp(req) {
+  const forwarded = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  return forwarded || req.socket.remoteAddress || 'unknown';
+}
+
+function logRequest(req, pathname, statusCode, durationMs, requestId) {
+  const record = {
+    ts: new Date().toISOString(),
+    requestId,
+    method: req.method,
+    path: pathname,
+    status: statusCode,
+    durationMs,
+    ip: getClientIp(req),
+    ua: String(req.headers['user-agent'] || '').slice(0, 160)
+  };
+  console.log('[HTTP]', JSON.stringify(record));
 }
 
 async function ensureDataFile() {
@@ -204,7 +259,7 @@ function validateReservation(payload) {
   const table = TABLES.find(item => item.id === payload.tableId);
   if (!table) return 'Neplatný stůl.';
   if (!Number.isInteger(guests) || guests < 1 || guests > VALIDATION.MAX_GUESTS) return 'Počet hostů musí být 1-' + VALIDATION.MAX_GUESTS + '.';
-  if (!Number.isInteger(vibe) || vibe < 1 || vibe > 10) return 'Neplatná hodnota vibe (1-10).';
+  if (!Number.isInteger(vibe) || vibe < 1 || vibe > 11) return 'Neplatná hodnota vibe (1-11).';
   if (guests > table.seats) return 'Vybraný stůl nemá dost míst.';
   if (!PATTERNS.DATE.test(payload.date)) return 'Neplatné datum.';
   if (!PATTERNS.TIME.test(payload.slot)) return 'Neplatný čas.';
@@ -259,9 +314,8 @@ async function handleApi(req, res, pathname) {
   // CORS preflight
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET,POST,PATCH,DELETE,OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
+      ...getSecurityHeaders(),
+      ...getCorsHeaders(req)
     });
     res.end();
     return;
@@ -271,10 +325,10 @@ async function handleApi(req, res, pathname) {
   if (pathname === '/api/reservations' && req.method === 'GET') {
     try {
       const reservations = await readReservations();
-      sendJson(res, 200, { reservations: sortReservations(reservations) });
+      sendJson(req, res, 200, { reservations: sortReservations(reservations) });
     } catch (error) {
       logError(error, 'GET /api/reservations');
-      sendJson(res, 500, { error: 'Chyba při čtení dat.' });
+      sendJson(req, res, 500, { error: 'Chyba při čtení dat.' });
     }
     return;
   }
@@ -284,21 +338,21 @@ async function handleApi(req, res, pathname) {
     const payload = await getBody(req);
     const error = validateReservation(payload);
     if (error) {
-      sendJson(res, 400, { error });
+      sendJson(req, res, 400, { error });
       return;
     }
 
     const reservations = await readReservations();
     const duplicate = reservations.find(item => item.date === payload.date && item.slot === payload.slot && item.tableId === payload.tableId);
     if (duplicate) {
-      sendJson(res, 409, { error: 'Tenhle stůl je v daném čase už rezervovaný.' });
+      sendJson(req, res, 409, { error: 'Tenhle stůl je v daném čase už rezervovaný.' });
       return;
     }
 
     const reservation = normalizeReservation(payload);
     reservations.push(reservation);
     await writeReservations(reservations);
-    sendJson(res, 201, { reservation });
+    sendJson(req, res, 201, { reservation });
     return;
   }
 
@@ -306,17 +360,17 @@ async function handleApi(req, res, pathname) {
   if (pathname.startsWith('/api/reservations/') && req.method === 'DELETE') {
     const id = pathname.split('/').pop();
     if (!isValidUUID(id)) {
-      sendJson(res, 400, { error: 'Neplatné ID.' });
+      sendJson(req, res, 400, { error: 'Neplatné ID.' });
       return;
     }
     const reservations = await readReservations();
     const nextReservations = reservations.filter(item => item.id !== id);
     if (nextReservations.length === reservations.length) {
-      sendJson(res, 404, { error: 'Rezervace nebyla nalezena.' });
+      sendJson(req, res, 404, { error: 'Rezervace nebyla nalezena.' });
       return;
     }
     await writeReservations(nextReservations);
-    sendJson(res, 200, { ok: true });
+    sendJson(req, res, 200, { ok: true });
     return;
   }
 
@@ -324,20 +378,20 @@ async function handleApi(req, res, pathname) {
   if (pathname.startsWith('/api/reservations/') && req.method === 'PATCH') {
     const id = pathname.split('/').pop();
     if (!isValidUUID(id)) {
-      sendJson(res, 400, { error: 'Neplatné ID.' });
+      sendJson(req, res, 400, { error: 'Neplatné ID.' });
       return;
     }
     const payload = await getBody(req);
     const patchError = validatePatchPayload(payload);
     if (patchError) {
-      sendJson(res, 400, { error: patchError });
+      sendJson(req, res, 400, { error: patchError });
       return;
     }
 
     const reservations = await readReservations();
     const index = reservations.findIndex(item => item.id === id);
     if (index === -1) {
-      sendJson(res, 404, { error: 'Rezervace nebyla nalezena.' });
+      sendJson(req, res, 404, { error: 'Rezervace nebyla nalezena.' });
       return;
     }
 
@@ -350,11 +404,11 @@ async function handleApi(req, res, pathname) {
     };
     reservations[index] = next;
     await writeReservations(reservations);
-    sendJson(res, 200, { reservation: next });
+    sendJson(req, res, 200, { reservation: next });
     return;
   }
 
-  sendJson(res, 404, { error: 'API endpoint nebyl nalezen.' });
+  sendJson(req, res, 404, { error: 'API endpoint nebyl nalezen.' });
 }
 
 // ===== STATIC FILE HANDLER =====
@@ -365,39 +419,51 @@ async function handleStatic(req, res, pathname) {
   const filePath = path.join(ROOT_DIR, normalized);
 
   if (!filePath.startsWith(ROOT_DIR)) {
-    sendText(res, 403, 'Forbidden');
+    sendText(req, res, 403, 'Forbidden');
     return;
   }
 
   try {
     const stat = await fs.promises.stat(filePath);
     if (stat.isDirectory()) {
-      sendText(res, 403, 'Forbidden');
+      sendText(req, res, 403, 'Forbidden');
       return;
     }
     const ext = path.extname(filePath).toLowerCase();
     const mimeType = MIME_TYPES[ext] || 'application/octet-stream';
-    res.writeHead(200, { 'Content-Type': mimeType });
+    res.writeHead(200, {
+      'Content-Type': mimeType,
+      ...getSecurityHeaders()
+    });
     fs.createReadStream(filePath).pipe(res);
   } catch {
-    sendText(res, 404, 'Not found');
+    sendText(req, res, 404, 'Not found');
   }
 }
 
 // ===== HTTP SERVER =====
 // Hlavní server - routuje API a static requesty
 const server = http.createServer(async (req, res) => {
+  const startedAt = Date.now();
+  const requestId = randomUUID();
+  let requestPath = String(req.url || '/');
+  res.setHeader('X-Request-Id', requestId);
+  res.on('finish', () => {
+    logRequest(req, requestPath, res.statusCode, Date.now() - startedAt, requestId);
+  });
+
   try {
     const url = new URL(req.url, 'http://localhost');
     const pathname = decodeURIComponent(url.pathname);
+    requestPath = pathname;
     if (pathname.startsWith('/api/')) {
       await handleApi(req, res, pathname);
       return;
     }
     await handleStatic(req, res, pathname);
   } catch (error) {
-    logError(error, 'HTTP Request Handler');
-    sendJson(res, 500, { error: 'Interní chyba serveru.' });
+    logError(error, `HTTP Request Handler [${requestId}]`);
+    sendJson(req, res, 500, { error: 'Interní chyba serveru.' });
   }
 });
 
