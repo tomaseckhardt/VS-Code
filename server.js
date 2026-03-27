@@ -111,7 +111,7 @@ function getSecurityHeaders() {
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Cross-Origin-Opener-Policy': 'same-origin',
     'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
-    'Content-Security-Policy': "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'"
+    'Content-Security-Policy': "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-src https://www.google.com"
   };
 }
 

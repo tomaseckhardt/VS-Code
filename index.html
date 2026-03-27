@@ -26,8 +26,8 @@
       "priceRange": "$$",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Korunni 12",
-        "addressLocality": "Praha",
+        "streetAddress": "Korunní 33",
+        "addressLocality": "Praha 2",
         "postalCode": "12000",
         "addressCountry": "CZ"
       },
@@ -74,6 +74,7 @@
     <ul class="nav-links">
       <li><a href="#menu" data-tip="Náš koktejlový lístek">Menu</a></li>
       <li><a href="#about" data-tip="Příběh a tým baru">O nás</a></li>
+      <!-- <li><a href="#gallery" data-tip="Fotky z baru">Galerie</a></li> -->
       <li><a href="#reservation" data-tip="Rezervuj stůl online">Rezervace</a></li>
       <li><a href="#contact" data-tip="Adresa a otevírací doba">Kontakt</a></li>
       <li><a aria-disabled="true" tabindex="-1" data-tip="Správa rezervací (interní)">Admin</a></li>
@@ -332,6 +333,91 @@
     </div>
   </section>
 
+  <!-- GALLERY (deaktivováno)
+  <section id="gallery">
+    <span class="section-label">Atmosféra</span>
+    <h2 class="section-title">Nahlédni do baru</h2>
+    <div class="gallery-grid">
+      <button class="gallery-item" data-caption="Barový pult s osvětlením" type="button" aria-label="Zvětšit fotku: Barový pult s osvětlením">
+        <div class="gallery-placeholder" style="--gp-hue:270">🍸</div>
+        <span class="gallery-caption">Barový pult</span>
+      </button>
+      <button class="gallery-item" data-caption="VIP salonek pro soukromé akce" type="button" aria-label="Zvětšit fotku: VIP salonek">
+        <div class="gallery-placeholder" style="--gp-hue:340">🛋️</div>
+        <span class="gallery-caption">VIP salonek</span>
+      </button>
+      <button class="gallery-item" data-caption="Signature koktejl MonstRum" type="button" aria-label="Zvětšit fotku: Signature koktejl">
+        <div class="gallery-placeholder" style="--gp-hue:150">🐉</div>
+        <span class="gallery-caption">Signature drinky</span>
+      </button>
+      <button class="gallery-item" data-caption="Páteční večer v plném proudu" type="button" aria-label="Zvětšit fotku: Páteční večer">
+        <div class="gallery-placeholder" style="--gp-hue:30">🎶</div>
+        <span class="gallery-caption">Páteční party</span>
+      </button>
+      <button class="gallery-item" data-caption="Lounge zóna s výhledem" type="button" aria-label="Zvětšit fotku: Lounge zóna">
+        <div class="gallery-placeholder" style="--gp-hue:200">🌙</div>
+        <span class="gallery-caption">Lounge zóna</span>
+      </button>
+      <button class="gallery-item" data-caption="Detail přípravy koktejlu" type="button" aria-label="Zvětšit fotku: Příprava koktejlu">
+        <div class="gallery-placeholder" style="--gp-hue:50">✨</div>
+        <span class="gallery-caption">Za barem</span>
+      </button>
+    </div>
+  </section>
+  -->
+
+  <!-- REVIEWS -->
+  <section id="reviews">
+    <span class="section-label">Co o nás říkají</span>
+    <h2 class="section-title">Recenze hostů</h2>
+    <div class="reviews-grid">
+      <div class="review-card reveal">
+        <div class="review-stars" aria-label="5 z 5 hvězd">★★★★★</div>
+        <p class="review-text">„Nejlepší koktejlový bar v Praze! MonstRum je absolutní bomba a atmosféra je naprosto unikátní. Budeme se vracet."</p>
+        <div class="review-author">
+          <div class="review-avatar">MK</div>
+          <div>
+            <strong>Martin K.</strong>
+            <span>Pravidelný host</span>
+          </div>
+        </div>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-stars" aria-label="5 z 5 hvězd">★★★★★</div>
+        <p class="review-text">„Rezervace online je super jednoduchá. Přišli jsme a stůl byl připravený, drink objednaný předem. Profesionální a zároveň mega pohodový."</p>
+        <div class="review-author">
+          <div class="review-avatar">LP</div>
+          <div>
+            <strong>Lucie P.</strong>
+            <span>Narozeninová oslava</span>
+          </div>
+        </div>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-stars" aria-label="4 z 5 hvězd">★★★★☆</div>
+        <p class="review-text">„Dark Velvet je umělecké dílo. Personál je milý, prostředí jako z filmu. Jediné minus — chtěl bych větší porce! 😄"</p>
+        <div class="review-author">
+          <div class="review-avatar">JN</div>
+          <div>
+            <strong>Jakub N.</strong>
+            <span>Firemní akce</span>
+          </div>
+        </div>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-stars" aria-label="5 z 5 hvězd">★★★★★</div>
+        <p class="review-text">„Vibe systém je geniální! Nastavili jsme na 10 a dostali slevu. Celý večer skvělá nálada a drinky skvělý."</p>
+        <div class="review-author">
+          <div class="review-avatar">TS</div>
+          <div>
+            <strong>Tereza S.</strong>
+            <span>Páteční výlet</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- RESERVATION -->
   <section id="reservation">
     <span class="section-label">Rezervace</span>
@@ -379,18 +465,19 @@
               <span id="guestCountError" class="field-error"></span>
             </div>
             <div class="field">
-              <label for="reservationDrink">Drink večera</label>
+              <label for="reservationDrink">Pre-order drinku</label>
               <select id="reservationDrink" name="reservationDrink" required>
-                <option value="MonstRum">MonstRum</option>
-                <option value="Shockbrero">Shockbrero</option>
-                <option value="Dark Velvet">Dark Velvet</option>
-                <option value="Neon Opal">Neon Opal</option>
-                <option value="Crimson Storm">Crimson Storm</option>
-                <option value="Gold Rush">Gold Rush</option>
-                <option value="Shadow Master">Shadow Master</option>
-                <option value="Violet Ice">Violet Ice</option>
-                <option value="Smoke Signal">Smoke Signal</option>
+                <option value="MonstRum">MonstRum – 149 Kč</option>
+                <option value="Shockbrero">Shockbrero – 159 Kč</option>
+                <option value="Dark Velvet">Dark Velvet – 169 Kč</option>
+                <option value="Neon Opal">Neon Opal – 145 Kč</option>
+                <option value="Crimson Storm">Crimson Storm – 79 Kč</option>
+                <option value="Gold Rush">Gold Rush – 175 Kč</option>
+                <option value="Shadow Master">Shadow Master – 139 Kč</option>
+                <option value="Violet Ice">Violet Ice – 89 Kč</option>
+                <option value="Smoke Signal">Smoke Signal – 85 Kč</option>
               </select>
+              <span class="field-hint">Drink bude připravený u stolu, když dorazíte.</span>
             </div>
             <div class="field">
               <label for="reservationDate">Datum</label>
@@ -455,7 +542,7 @@
               <strong id="summaryTable">Vyber místo</strong>
             </div>
             <div class="summary-row">
-              <span>Drink</span>
+              <span>Pre-order</span>
               <strong id="summaryDrink">Vyber drink</strong>
             </div>
             <div class="summary-row">
@@ -510,7 +597,7 @@
       <div class="contact-card">
         <div class="contact-icon">📍</div>
         <div class="contact-label">Adresa</div>
-        <div class="contact-value">Korunní 12<br>Praha 2, 120 00</div>
+        <div class="contact-value">Korunní 33<br>Praha 2 – Vinohrady, 120 00</div>
       </div>
       <div class="contact-card">
         <div class="contact-icon">🕐</div>
@@ -528,6 +615,9 @@
         <div class="contact-label">E-mail</div>
         <div class="contact-value">hello@barx.cz</div>
       </div>
+    </div>
+    <div class="contact-map">
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3207.3863467067767!2d14.440617377126754!3d50.075528971523035!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x470b9484f87841b5%3A0x4dbca5c5f59ecf75!2sKorunn%C3%AD%20969%2F33%2C%20120%2000%20Vinohrady!5e1!3m2!1sen!2scz!4v1774618154702!5m2!1sen!2scz" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>
   </section>
   </main>
@@ -555,6 +645,32 @@
       </div>
     </div>
   </div>
+
+  <!-- QR CONFIRMATION MODAL -->
+  <div id="qrModal" class="qr-modal" hidden aria-hidden="true">
+    <div class="qr-modal-backdrop" data-close-qr="true"></div>
+    <div class="qr-modal-dialog" role="dialog" aria-modal="true" aria-label="Potvrzení rezervace s QR kódem">
+      <button class="qr-modal-close" type="button" aria-label="Zavřít">×</button>
+      <div class="qr-modal-header">
+        <div class="qr-modal-check">✓</div>
+        <h3>Rezervace potvrzena!</h3>
+        <p>Ukažte tento QR kód při příchodu do baru</p>
+      </div>
+      <div id="qrCodeContainer" class="qr-code-container"></div>
+      <div id="qrDetails" class="qr-details"></div>
+    </div>
+  </div>
+
+  <!-- GALLERY LIGHTBOX (deaktivováno)
+  <div id="galleryLightbox" class="gallery-lightbox" hidden aria-hidden="true">
+    <div class="gallery-lightbox-backdrop" data-close-lightbox="true"></div>
+    <div class="gallery-lightbox-content" role="dialog" aria-modal="true" aria-label="Zvětšená fotografie">
+      <button class="gallery-lightbox-close" type="button" aria-label="Zavřít">×</button>
+      <div id="galleryLightboxVisual" class="gallery-lightbox-visual"></div>
+      <p id="galleryLightboxCaption" class="gallery-lightbox-caption"></p>
+    </div>
+  </div>
+  -->
 
   <!-- FOOTER -->
   <footer>
@@ -1043,6 +1159,15 @@
       updateSummary();
     }
 
+    // Happy hour: Mon-Sat 17:00-18:59 (first 2 slots)
+    function isHappyHour(dateValue, slotValue) {
+      if (!dateValue) return false;
+      const day = new Date(dateValue + 'T12:00:00').getDay();
+      if (day === 0) return false; // Neděle - žádný HH
+      const hour = parseInt(slotValue, 10);
+      return hour >= 17 && hour <= 18;
+    }
+
     function renderSlots() {
       const slots = getSlotsForDate(reservationDateInput.value);
       slotGrid.innerHTML = '';
@@ -1052,6 +1177,8 @@
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'slot-btn';
+        const hh = isHappyHour(reservationDateInput.value, slot.value);
+        if (hh) button.classList.add('is-happy-hour');
         const availableTables = TABLES.filter(table => table.seats >= Number(guestCountInput.value || 0))
           .filter(table => !isReserved(reservationDateInput.value, slot.value, table.id)).length;
         if (availableTables === 0) {
@@ -1060,7 +1187,8 @@
         if (state.selectedSlot === slot.value) {
           button.classList.add('is-selected');
         }
-        button.innerHTML = '<strong>' + slot.label + '</strong><span>' + slot.meta + '</span><small>' + availableTables + ' volných</small>';
+        const hhBadge = hh ? '<span class="hh-tag">🍹 Happy Hour</span>' : '';
+        button.innerHTML = '<strong>' + slot.label + '</strong><span>' + slot.meta + '</span>' + hhBadge + '<small>' + availableTables + ' volných</small>';
         button.addEventListener('click', () => {
           if (availableTables === 0) return;
           state.selectedSlot = slot.value;
@@ -1118,8 +1246,12 @@
 
       reservations.forEach(item => {
         const table = TABLES.find(entry => entry.id === item.tableId);
+        const tableName = table ? table.name + ' · ' + table.zone : item.tableId;
         const wrapper = document.createElement('article');
-        wrapper.className = 'saved-item';
+        wrapper.className = 'saved-item is-clickable';
+        wrapper.setAttribute('role', 'button');
+        wrapper.setAttribute('tabindex', '0');
+        wrapper.setAttribute('aria-label', 'Zobrazit detail rezervace ' + item.name);
         wrapper.innerHTML =
           '<div class="saved-item-head">' +
             '<div><strong>' + item.name + '</strong><div class="saved-badge">Rezervace potvrzena</div></div>' +
@@ -1127,16 +1259,33 @@
           '</div>' +
           '<div class="saved-meta">' +
             formatDate(item.date) + '<br>' +
-            (table ? table.name + ' · ' + table.zone : item.tableId) + '<br>' +
+            tableName + '<br>' +
             item.guests + ' hostů · ' + item.phone + '<br>' +
             'Drink: ' + (item.drink || 'neuveden') +
           '</div>' +
+          '<div class="saved-item-hint">Klikni pro detail a QR kód</div>' +
           '<div class="saved-actions">' +
             '<button type="button" class="ghost-btn" data-action="reuse">Použít znovu</button>' +
             '<button type="button" class="ghost-btn" data-action="cancel">Zrušit</button>' +
           '</div>';
 
-        wrapper.querySelector('[data-action="reuse"]').addEventListener('click', () => {
+        // Open detail popup on card click
+        wrapper.addEventListener('click', function(e) {
+          if (e.target.closest('[data-action]')) return;
+          const hasDiscount = (item.vibe || 0) >= DISCOUNT_TRIGGER_VIBE;
+          showReservationQR({
+            id: item.id,
+            name: item.name,
+            date: item.date,
+            slot: item.slot,
+            table: tableName,
+            drink: item.drink || 'neuveden',
+            hasDiscount: hasDiscount
+          }, 'detail');
+        });
+
+        wrapper.querySelector('[data-action="reuse"]').addEventListener('click', (e) => {
+          e.stopPropagation();
           document.getElementById('guestName').value = item.name;
           document.getElementById('guestPhone').value = item.phone;
           document.getElementById('guestEmail').value = item.email;
@@ -1153,7 +1302,8 @@
           setStatus('Předvyplnil jsem údaje podle vybrané rezervace.', 'success');
         });
 
-        wrapper.querySelector('[data-action="cancel"]').addEventListener('click', async () => {
+        wrapper.querySelector('[data-action="cancel"]').addEventListener('click', async (e) => {
+          e.stopPropagation();
           try {
             await apiRequest(API_BASE + '/' + item.id, { method: 'DELETE' });
             await loadReservations();
@@ -1330,7 +1480,7 @@
       });
     }, { threshold: 0.1 });
 
-    document.querySelectorAll('.drink-card, .contact-card, .about-inner p, .section-label, .reservation-panel, .reservation-aside').forEach((element, index) => {
+    document.querySelectorAll('.drink-card, .contact-card, .about-inner p, .section-label, .reservation-panel, .reservation-aside, .gallery-item, .review-card').forEach((element, index) => {
       element.classList.add('reveal');
       element.style.transitionDelay = ((index % 5) * 0.08) + 's';
       revealObserver.observe(element);
@@ -1484,7 +1634,7 @@
           return;
         }
 
-        await apiRequest(API_BASE, {
+        const result = await apiRequest(API_BASE, {
           method: 'POST',
           body: JSON.stringify({
             name,
@@ -1499,6 +1649,9 @@
             vibe
           })
         });
+        const savedSlot = state.selectedSlot;
+        const savedTableName = table.name + ' · ' + table.zone;
+        const savedId = result.reservation ? result.reservation.id : '';
         await loadReservations();
         reservationForm.reset();
         guestCountInput.value = '4';
@@ -1510,6 +1663,18 @@
         clearValidation();
         updateVibeUI();
         refreshReservationUI();
+
+        // Show QR code confirmation
+        showReservationQR({
+          id: savedId,
+          name,
+          date: dateValue,
+          slot: savedSlot,
+          table: savedTableName,
+          drink,
+          hasDiscount
+        });
+        trackLoyaltyVisit(email);
         setStatus(
           hasDiscount
             ? 'Rezervace byla uložená + přidal jsem poznámku o 10% slevě (vibe 9+).'
@@ -1549,6 +1714,191 @@
     }
 
     closeDrinkModal();
+
+    // ===== QR CODE GENERATION =====
+    // Simple QR-like visual code using reservation ID hash
+    function generateQRSvg(text) {
+      // Generate deterministic grid pattern from text hash
+      const size = 21;
+      const cellSize = 8;
+      const svgSize = size * cellSize;
+      let hash = 0;
+      for (let i = 0; i < text.length; i++) {
+        hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0;
+      }
+      const cells = [];
+      // Fixed finder patterns (corners)
+      function addFinder(ox, oy) {
+        for (let y = 0; y < 7; y++) {
+          for (let x = 0; x < 7; x++) {
+            const border = x === 0 || x === 6 || y === 0 || y === 6;
+            const inner = x >= 2 && x <= 4 && y >= 2 && y <= 4;
+            if (border || inner) cells.push([ox + x, oy + y]);
+          }
+        }
+      }
+      addFinder(0, 0);
+      addFinder(size - 7, 0);
+      addFinder(0, size - 7);
+      // Data cells from hash
+      const rng = { s: Math.abs(hash) || 1 };
+      function nextBit() {
+        rng.s ^= rng.s << 13;
+        rng.s ^= rng.s >> 17;
+        rng.s ^= rng.s << 5;
+        return (rng.s >>> 0) % 2;
+      }
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const inFinder = (x < 8 && y < 8) || (x >= size - 8 && y < 8) || (x < 8 && y >= size - 8);
+          if (inFinder) continue;
+          if (nextBit()) cells.push([x, y]);
+        }
+      }
+      let rects = '';
+      cells.forEach(function(c) {
+        rects += '<rect x="' + (c[0] * cellSize) + '" y="' + (c[1] * cellSize) + '" width="' + cellSize + '" height="' + cellSize + '" rx="1"/>';
+      });
+      return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + svgSize + ' ' + svgSize + '" width="' + svgSize + '" height="' + svgSize + '">' +
+        '<rect width="' + svgSize + '" height="' + svgSize + '" fill="#fff" rx="8"/>' +
+        '<g fill="#1c1829">' + rects + '</g></svg>';
+    }
+
+    function showReservationQR(info, mode) {
+      var isDetail = mode === 'detail';
+      var qrModal = document.getElementById('qrModal');
+      var qrContainer = document.getElementById('qrCodeContainer');
+      var qrDetails = document.getElementById('qrDetails');
+      var headerEl = qrModal.querySelector('.qr-modal-header');
+      var qrText = 'BARX:' + info.id;
+      qrContainer.innerHTML = generateQRSvg(qrText);
+      // Update header based on mode
+      headerEl.querySelector('.qr-modal-check').textContent = isDetail ? '📋' : '✓';
+      headerEl.querySelector('h3').textContent = isDetail ? 'Detail rezervace' : 'Rezervace potvrzena!';
+      headerEl.querySelector('p').textContent = isDetail
+        ? 'Ukažte QR kód při příchodu do baru'
+        : 'Ukažte tento QR kód při příchodu do baru';
+      qrDetails.innerHTML =
+        '<div class="qr-detail-row"><span>Jméno</span><strong>' + info.name + '</strong></div>' +
+        '<div class="qr-detail-row"><span>Datum</span><strong>' + formatDate(info.date) + '</strong></div>' +
+        '<div class="qr-detail-row"><span>Čas</span><strong>' + info.slot + '</strong></div>' +
+        '<div class="qr-detail-row"><span>Stůl</span><strong>' + info.table + '</strong></div>' +
+        '<div class="qr-detail-row"><span>Pre-order</span><strong>' + info.drink + '</strong></div>' +
+        (info.hasDiscount ? '<div class="qr-detail-row qr-discount"><span>Sleva</span><strong>10% VIP Vibe</strong></div>' : '') +
+        '<div class="qr-detail-row qr-id"><span>ID</span><strong>' + info.id.slice(0, 8) + '</strong></div>';
+      qrModal.hidden = false;
+      qrModal.classList.add('is-open');
+      qrModal.setAttribute('aria-hidden', 'false');
+      qrModal.querySelector('.qr-modal-close').focus();
+    }
+
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('[data-close-qr]') || e.target.closest('.qr-modal-close')) {
+        const qrModal = document.getElementById('qrModal');
+        qrModal.hidden = true;
+        qrModal.classList.remove('is-open');
+        qrModal.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    // ===== GALLERY LIGHTBOX (deaktivováno) =====
+    /*
+    const galleryLightbox = document.getElementById('galleryLightbox');
+    document.querySelectorAll('.gallery-item').forEach(function(item) {
+      item.addEventListener('click', function() {
+        const visual = item.querySelector('.gallery-placeholder');
+        const caption = item.dataset.caption || '';
+        const lbVisual = document.getElementById('galleryLightboxVisual');
+        const lbCaption = document.getElementById('galleryLightboxCaption');
+        lbVisual.innerHTML = '';
+        const clone = visual.cloneNode(true);
+        clone.classList.add('gallery-lightbox-placeholder');
+        lbVisual.appendChild(clone);
+        lbCaption.textContent = caption;
+        galleryLightbox.hidden = false;
+        galleryLightbox.classList.add('is-open');
+        galleryLightbox.setAttribute('aria-hidden', 'false');
+        galleryLightbox.querySelector('.gallery-lightbox-close').focus();
+      });
+    });
+
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('[data-close-lightbox]') || e.target.closest('.gallery-lightbox-close')) {
+        galleryLightbox.hidden = true;
+        galleryLightbox.classList.remove('is-open');
+        galleryLightbox.setAttribute('aria-hidden', 'true');
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !galleryLightbox.hidden) {
+        galleryLightbox.hidden = true;
+        galleryLightbox.classList.remove('is-open');
+        galleryLightbox.setAttribute('aria-hidden', 'true');
+      }
+    });
+    */
+
+    // ===== LOYALTY SYSTEM =====
+    // Track visits by email in localStorage
+    const LOYALTY_KEY = 'barx_loyalty';
+
+    function getLoyaltyData() {
+      try {
+        return JSON.parse(localStorage.getItem(LOYALTY_KEY) || '{}');
+      } catch { return {}; }
+    }
+
+    function trackLoyaltyVisit(email) {
+      if (!email) return;
+      const data = getLoyaltyData();
+      const key = email.toLowerCase().trim();
+      if (!data[key]) data[key] = { visits: 0, lastVisit: '' };
+      data[key].visits += 1;
+      data[key].lastVisit = new Date().toISOString();
+      localStorage.setItem(LOYALTY_KEY, JSON.stringify(data));
+      return data[key];
+    }
+
+    function getLoyaltyInfo(email) {
+      if (!email) return null;
+      const data = getLoyaltyData();
+      return data[email.toLowerCase().trim()] || null;
+    }
+
+    function getLoyaltyBadge(visits) {
+      if (visits >= 10) return { tier: 'GOLD', label: '🥇 Gold member', next: null, perk: 'Stálá sleva 15% na každou návštěvu' };
+      if (visits >= 5) return { tier: 'SILVER', label: '🥈 Silver member', next: 10 - visits, perk: 'Drink zdarma při každé 5. návštěvě' };
+      if (visits >= 3) return { tier: 'BRONZE', label: '🥉 Bronze member', next: 5 - visits, perk: 'Přednostní rezervace stolů' };
+      return { tier: 'NEW', label: '👋 Nový host', next: 3 - visits, perk: null };
+    }
+
+    function updateLoyaltyBadge() {
+      const email = guestEmailInput.value.trim();
+      let badge = document.getElementById('loyaltyBadge');
+      if (!email || !isValidEmail(email)) {
+        if (badge) badge.hidden = true;
+        return;
+      }
+      const info = getLoyaltyInfo(email);
+      if (!info) {
+        if (badge) badge.hidden = true;
+        return;
+      }
+      const loyalty = getLoyaltyBadge(info.visits);
+      if (!badge) {
+        badge = document.createElement('div');
+        badge.id = 'loyaltyBadge';
+        badge.className = 'loyalty-badge';
+        guestEmailInput.closest('.field').appendChild(badge);
+      }
+      badge.hidden = false;
+      badge.className = 'loyalty-badge loyalty-' + loyalty.tier.toLowerCase();
+      badge.innerHTML = '<strong>' + loyalty.label + '</strong> · ' + info.visits + ' návštěv' +
+        (loyalty.perk ? '<br><span>' + loyalty.perk + '</span>' : '') +
+        (loyalty.next ? '<br><span>Do dalšího levelu: ' + loyalty.next + ' návštěv</span>' : '');
+    }
+
+    guestEmailInput.addEventListener('blur', updateLoyaltyBadge);
 
     initReservationSystem();
   </script>

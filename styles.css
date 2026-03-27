@@ -786,6 +786,211 @@
       margin-top: .2rem;
     }
 
+    /* ── GALLERY ────────────────────────────────────── */
+    #gallery {
+      background: var(--surface);
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .gallery-item {
+      position: relative;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.06);
+      background: var(--card);
+      cursor: pointer;
+      transition: transform .25s ease, box-shadow .25s ease;
+      padding: 0;
+      font: inherit;
+      color: inherit;
+      text-align: left;
+      aspect-ratio: 4/3;
+    }
+    .gallery-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgba(0,0,0,.3);
+    }
+    .gallery-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      background: linear-gradient(
+        135deg,
+        hsl(var(--gp-hue, 270) 55% 18%),
+        hsl(var(--gp-hue, 270) 60% 28%)
+      );
+    }
+    .gallery-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: .7rem 1rem;
+      background: linear-gradient(to top, rgba(13,11,18,.85), transparent);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    /* Gallery Lightbox */
+    .gallery-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .gallery-lightbox.is-open {
+      display: flex;
+    }
+    .gallery-lightbox-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.85);
+      backdrop-filter: blur(8px);
+    }
+    .gallery-lightbox-content {
+      position: relative;
+      max-width: 700px;
+      width: 100%;
+      background: var(--card);
+      border-radius: 26px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 32px 80px rgba(0,0,0,.5);
+    }
+    .gallery-lightbox-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 2;
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.15);
+      background: rgba(13,11,18,.7);
+      color: #fff;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gallery-lightbox-visual {
+      width: 100%;
+      aspect-ratio: 16/10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gallery-lightbox-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 6rem;
+    }
+    .gallery-lightbox-caption {
+      padding: 1.2rem 1.5rem;
+      font-size: 1rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ── REVIEWS ───────────────────────────────────── */
+    #reviews {
+      background: var(--bg);
+    }
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .review-card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 22px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: .8rem;
+      transition: transform .35s cubic-bezier(.22,1,.36,1),
+                  box-shadow .35s cubic-bezier(.22,1,.36,1),
+                  border-color .3s;
+      will-change: transform;
+    }
+    .review-card:hover {
+      transform: scale(1.045) translateY(-6px);
+      border-color: rgba(255,212,95,.25);
+      box-shadow: 0 18px 40px rgba(0,0,0,.35), 0 0 0 1px rgba(255,212,95,.12);
+    }
+    .review-card:hover .review-stars {
+      animation: starPop .4s ease;
+    }
+    @keyframes starPop {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+    .review-stars {
+      font-size: 1.1rem;
+      letter-spacing: .15em;
+      color: #ffd45f;
+    }
+    .review-text {
+      font-size: .92rem;
+      line-height: 1.65;
+      color: var(--muted);
+      font-style: italic;
+      flex: 1;
+    }
+    .review-author {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-top: .4rem;
+    }
+    .review-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent1), var(--accent3));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: .72rem;
+      letter-spacing: .04em;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .review-author strong {
+      display: block;
+      color: #fff;
+      font-size: .88rem;
+    }
+    .review-author span {
+      display: block;
+      font-size: .72rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+    }
+
     /* ── RESERVATIONS ─────────────────────────────── */
     #reservation {
       position: relative;
@@ -1453,6 +1658,212 @@
     }
     .admin-link:hover { color: #fff; }
 
+    /* ── HAPPY HOUR TAG ─────────────────────────────── */
+    .slot-btn.is-happy-hour {
+      border-color: rgba(255,212,95,.35);
+      background: linear-gradient(135deg, rgba(255,212,95,.08), rgba(13,11,18,.52));
+    }
+    .slot-btn.is-happy-hour:not(.is-disabled):hover {
+      border-color: rgba(255,212,95,.6);
+    }
+    .hh-tag {
+      display: block;
+      margin-top: .35rem;
+      font-size: .62rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #ffd45f;
+    }
+
+    /* ── QR MODAL ──────────────────────────────────── */
+    .qr-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .qr-modal.is-open {
+      display: flex;
+    }
+    .qr-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.8);
+      backdrop-filter: blur(8px);
+    }
+    .qr-modal-dialog {
+      position: relative;
+      max-width: 380px;
+      width: 100%;
+      background: var(--card);
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 32px 80px rgba(0,0,0,.5);
+      padding: 2rem;
+      text-align: center;
+    }
+    .qr-modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(13,11,18,.6);
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qr-modal-header {
+      margin-bottom: 1.2rem;
+    }
+    .qr-modal-check {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(100,255,170,.3), rgba(0,212,170,.2));
+      border: 2px solid rgba(100,255,170,.5);
+      color: #7ee0b6;
+      font-size: 1.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .qr-modal-header h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: .06em;
+      color: #fff;
+      margin-bottom: .3rem;
+    }
+    .qr-modal-header p {
+      font-size: .88rem;
+      color: var(--muted);
+    }
+    .qr-code-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+    }
+    .qr-code-container svg {
+      width: 168px;
+      height: 168px;
+      border-radius: 12px;
+    }
+    .qr-details {
+      text-align: left;
+    }
+
+    /* ── SAVED ITEM CLICKABLE ──────────────────────── */
+    .saved-item.is-clickable {
+      cursor: pointer;
+      transition: border-color .2s, box-shadow .2s, transform .15s;
+    }
+    .saved-item.is-clickable:hover,
+    .saved-item.is-clickable:focus-visible {
+      border-color: var(--accent2);
+      box-shadow: 0 0 0 1px var(--accent2), 0 8px 24px rgba(0,0,0,.3);
+      transform: translateY(-2px);
+    }
+    .saved-item.is-clickable:focus-visible {
+      outline: 2px solid var(--accent2);
+      outline-offset: 2px;
+    }
+    .saved-item-hint {
+      font-size: .75rem;
+      color: var(--muted);
+      opacity: .6;
+      margin-top: .4rem;
+      transition: opacity .2s;
+    }
+    .saved-item.is-clickable:hover .saved-item-hint {
+      opacity: 1;
+      color: var(--accent2);
+    }
+    .qr-detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: .4rem 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .qr-detail-row:last-child { border-bottom: 0; }
+    .qr-detail-row span {
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .qr-detail-row strong {
+      color: #fff;
+      font-size: .88rem;
+    }
+    .qr-detail-row.qr-discount strong {
+      color: #ffd45f;
+    }
+    .qr-detail-row.qr-id strong {
+      font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    /* ── LOYALTY BADGE ─────────────────────────────── */
+    .loyalty-badge {
+      margin-top: .4rem;
+      padding: .5rem .7rem;
+      border-radius: 14px;
+      font-size: .78rem;
+      line-height: 1.5;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+    }
+    .loyalty-badge strong {
+      color: #fff;
+      font-size: .82rem;
+    }
+    .loyalty-badge span {
+      font-size: .72rem;
+      color: var(--muted);
+    }
+    .loyalty-bronze {
+      border-color: rgba(205,127,50,.4);
+      background: rgba(205,127,50,.1);
+    }
+    .loyalty-bronze strong { color: #cd7f32; }
+    .loyalty-silver {
+      border-color: rgba(192,192,192,.4);
+      background: rgba(192,192,192,.1);
+    }
+    .loyalty-silver strong { color: #c0c0c0; }
+    .loyalty-gold {
+      border-color: rgba(255,212,95,.5);
+      background: linear-gradient(135deg, rgba(255,212,95,.15), rgba(255,77,109,.08));
+    }
+    .loyalty-gold strong { color: #ffd45f; }
+
+    /* ── CONTACT MAP ───────────────────────────────── */
+    .contact-map {
+      max-width: 900px;
+      margin: 2rem auto 0;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .contact-map iframe {
+      display: block;
+      width: 100%;
+      height: 300px;
+    }
+
     /* ── CONTACT ───────────────────────────────────── */
     #contact { background: var(--surface); }
     .contact-grid {
@@ -1628,6 +2039,52 @@
         font-size: .68rem;
         letter-spacing: .06em;
         padding: .34rem .58rem;
+      }
+
+      /* Gallery responsive */
+      .gallery-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      /* Gallery lightbox responsive */
+      .gallery-lightbox-content {
+        width: calc(100vw - 1.5rem);
+        max-height: calc(100vh - 1.5rem);
+      }
+      .gallery-lightbox-visual {
+        max-height: 50vh;
+      }
+
+      /* Reviews responsive */
+      .reviews-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      /* QR modal responsive */
+      .qr-modal-dialog {
+        width: calc(100vw - 1.5rem);
+        max-width: calc(100vw - 1.5rem);
+        padding: 1.5rem;
+      }
+      .qr-code-container svg {
+        width: 140px;
+        height: 140px;
+      }
+      .qr-details {
+        font-size: .85rem;
+      }
+
+      /* Loyalty badge responsive */
+      .loyalty-badge {
+        font-size: .75rem;
+        padding: .4rem .7rem;
+      }
+
+      /* Contact map responsive */
+      .contact-map {
+        height: 220px;
       }
     }
 
