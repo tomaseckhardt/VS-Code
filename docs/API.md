@@ -61,7 +61,7 @@ Vytvoří novou rezervaci.
 | Pole | Pravidlo |
 |------|----------|
 | `guests` | 1–100, integer, nesmí překročit kapacitu stolu |
-| `vibe` | 1–10, integer |
+| `vibe` | 1–11, integer |
 | `date` | Formát `YYYY-MM-DD` |
 | `slot` | Formát `HH:00` |
 | `tableId` | Musí odpovídat existujícímu stolu |

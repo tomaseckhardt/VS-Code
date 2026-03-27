@@ -5,7 +5,7 @@
 ```
 ┌─────────────┐     HTTP      ┌─────────────┐     JSON fs     ┌──────────────────┐
 │  index.html │ ◄──────────► │  server.js  │ ◄────────────► │ reservations.json │
-│  admin.html │   fetch API   │  (Node.js)  │   read/write    │   (persistentce)  │
+│  admin.html │   fetch API   │  (Node.js)  │   read/write    │   (persistence)  │
 │  styles.css │               │             │                 │                    │
 └─────────────┘               └─────────────┘                 └──────────────────┘
                                     │
@@ -52,7 +52,7 @@ interface Reservation {
   date: string;          // YYYY-MM-DD
   slot: string;          // HH:00
   tableId: string;       // bar-2 | window-4 | lounge-4 | booth-6 | vip-8
-  vibe: number;          // 1–10
+  vibe: number;          // 1–11
   status: string;        // new | called | confirmed | done | completed
   note: string;
   drink: string;

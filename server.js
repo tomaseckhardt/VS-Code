@@ -100,8 +100,8 @@ function autoCompleteExpiredReservations(items) {
 // Odeslání JSON odpovědi s CORS headerem
 function getCorsOrigin(req) {
   const origin = String(req.headers.origin || '').trim();
-  if (!origin) return 'null';
-  return ALLOWED_ORIGINS.has(origin) ? origin : 'null';
+  if (!origin) return null;
+  return ALLOWED_ORIGINS.has(origin) ? origin : null;
 }
 
 function getSecurityHeaders() {
@@ -116,12 +116,14 @@ function getSecurityHeaders() {
 }
 
 function getCorsHeaders(req) {
-  return {
-    'Access-Control-Allow-Origin': getCorsOrigin(req),
-    'Access-Control-Allow-Methods': 'GET,POST,PATCH,DELETE,OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Vary': 'Origin'
-  };
+  const origin = getCorsOrigin(req);
+  const headers = { 'Vary': 'Origin' };
+  if (origin) {
+    headers['Access-Control-Allow-Origin'] = origin;
+    headers['Access-Control-Allow-Methods'] = 'GET,POST,PATCH,DELETE,OPTIONS';
+    headers['Access-Control-Allow-Headers'] = 'Content-Type';
+  }
+  return headers;
 }
 
 function sendJson(req, res, statusCode, payload) {
@@ -257,7 +259,7 @@ function validateReservation(payload) {
   const table = TABLES.find(item => item.id === payload.tableId);
   if (!table) return 'Neplatný stůl.';
   if (!Number.isInteger(guests) || guests < 1 || guests > VALIDATION.MAX_GUESTS) return 'Počet hostů musí být 1-' + VALIDATION.MAX_GUESTS + '.';
-  if (!Number.isInteger(vibe) || vibe < 1 || vibe > 10) return 'Neplatná hodnota vibe (1-10).';
+  if (!Number.isInteger(vibe) || vibe < 1 || vibe > 11) return 'Neplatná hodnota vibe (1-11).';
   if (guests > table.seats) return 'Vybraný stůl nemá dost míst.';
   if (!PATTERNS.DATE.test(payload.date)) return 'Neplatné datum.';
   if (!PATTERNS.TIME.test(payload.slot)) return 'Neplatný čas.';

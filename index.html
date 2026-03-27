@@ -794,11 +794,13 @@
     // Nastaví minimální datum na zítra
     // ===== DATE & TIME UTILITIES =====
     function setMinDate() {
-      // Nastaví minimální datum na zítra
+      // Nastaví minimální datum na zítra (lokální čas, ne UTC)
       const minDate = new Date();
-      minDate.setHours(0, 0, 0, 0);
       minDate.setDate(minDate.getDate() + 1);
-      const minDateIso = minDate.toISOString().split('T')[0];
+      const minDateIso =
+        minDate.getFullYear() + '-' +
+        String(minDate.getMonth() + 1).padStart(2, '0') + '-' +
+        String(minDate.getDate()).padStart(2, '0');
       reservationDateInput.min = minDateIso;
       if (!reservationDateInput.value) {
         reservationDateInput.value = minDateIso;
@@ -1161,10 +1163,20 @@
 
     function updateAvailabilityHint() {
       if (!reservationAvailability) return;
-      const todayIso = new Date().toISOString().split('T')[0];
+      const today = new Date();
+      const todayIso =
+        today.getFullYear() + '-' +
+        String(today.getMonth() + 1).padStart(2, '0') + '-' +
+        String(today.getDate()).padStart(2, '0');
+      const selectedSlot = state && state.selectedSlot;
       const occupiedTables = new Set(
         state.reservations
-          .filter(item => item.date === todayIso)
+          .filter(item => {
+            if (item.date !== todayIso) return false;
+            if (item.status === 'completed' || item.status === 'done') return false;
+            if (selectedSlot) return item.slot === selectedSlot;
+            return true;
+          })
           .map(item => item.tableId)
       );
       const freeTables = Math.max(0, TABLES.length - occupiedTables.size);
