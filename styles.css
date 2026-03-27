@@ -952,7 +952,7 @@
       flex: 1 1 260px;
       position: relative;
       overflow: visible;
-      clip-path: inset(-6px 0 -6px 0 round 999px);
+      clip-path: inset(-6px -4px -6px -8px round 999px);
       border-radius: 999px;
       height: 22px;
       display: flex;
