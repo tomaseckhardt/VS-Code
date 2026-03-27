@@ -1162,6 +1162,7 @@
       height: 22px;
       display: flex;
       align-items: center;
+      touch-action: none;
     }
     #plannedVibe {
       /* Range 1-11 (10 steps) — show only 9/10 so value 10 appears at visual end */
@@ -1169,15 +1170,19 @@
       margin-left: calc(-14px / 9);
       flex-shrink: 0;
       appearance: none;
+      -webkit-appearance: none;
       height: 8px;
       border-radius: 999px;
       background: linear-gradient(90deg, rgba(123,63,255,.85) 0%, rgba(255,77,109,.85) 90%, transparent 90%);
       border: none;
       outline: none;
       padding: 0;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
     }
     #plannedVibe::-webkit-slider-thumb {
       appearance: none;
+      -webkit-appearance: none;
       width: 14px;
       height: 14px;
       border-radius: 50%;
@@ -2021,11 +2026,23 @@
         column-gap: .6rem;
         row-gap: .65rem;
       }
-      #plannedVibe {
+      .vibe-slider-wrapper {
         grid-area: slider;
+        flex: none;
         width: 100%;
         min-width: 0;
-        flex: none;
+        clip-path: none;
+        overflow: hidden;
+        height: 44px;
+      }
+      #plannedVibe {
+        width: calc(100% * 10 / 9 + 28px * 2 / 9);
+        margin-left: calc(-28px / 9);
+        height: 10px;
+      }
+      #plannedVibe::-webkit-slider-thumb {
+        width: 28px;
+        height: 28px;
       }
       .vibe-value {
         grid-area: value;
